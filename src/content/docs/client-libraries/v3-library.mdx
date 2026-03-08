@@ -1,0 +1,153 @@
+---
+title: V3 Library
+description: Legacy encrypted library injected via Virtual Storage.
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+import { Shield, Rocket, Zap, Code, Lock, Info, Fingerprint } from 'lucide-react';
+
+<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+  <Rocket size={18} aria-hidden="true" />
+  <strong>V3 Library</strong>
+</div>
+
+Encrypted library injected via Virtual Storage.
+
+<Aside type="note">
+  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', fontWeight: 600 }}>
+    <Shield size={18} aria-hidden="true" />
+    <span>V3 Encrypted Library</span>
+  </div>
+  V3 uses AES-256-CBC encryption for all communications. The library is not open-source and must be injected via VSS (Virtual Script Storage). When you upload your script to Virtual Storage and select the V3 library, it will be automatically embedded into your script with the Service ID pre-configured.
+</Aside>
+
+## How to Integrate
+
+<Steps>
+1. <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Zap size={16} aria-hidden="true" />Upload to Virtual Storage</span>
+
+   Go to the Virtual Storage section in your dashboard and upload your Lua script. Select `V3 Library` from the library dropdown.
+
+2. <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Info size={16} aria-hidden="true" />Library Auto-Injection</span>
+
+   The V3 library will be automatically injected at the top of your script. The `Client_ServiceID` is automatically set to your service identifier.
+
+3. <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><Code size={16} aria-hidden="true" />Use the API</span>
+
+   Call `Pelinda.Init()` to validate keys. The library handles all encryption automatically.
+</Steps>
+
+## Sample Usage
+
+```lua
+-- V3 Library is automatically injected via Virtual Storage
+-- Service ID is auto-configured when uploading to Virtual Storage
+
+-- Initialize the Panda Key System
+local result = Pelinda.Init({
+    Key = "PANDA-XXXX-XXXX-XXXX-XXXX", -- User's license key
+    SilentMode = false,                     -- Set to true for silent mode
+    -- Service is auto-injected by Virtual Storage, no need to specify
+})
+
+-- Check the result (returns "validated!!", "invalid!!", or "error!!")
+if result == "validated!!" then
+    print("Authenticated!")
+    print("Premium:", __PELINDA_IS_PREMIUM__)
+    print("Expires:", __PELINDA_KEY_EXPIRES_AT__ or "Never")
+    print("HWID:", __PELINDA_KEY_HWID__)
+
+    -- Your script code here
+elseif result == "error!!" then
+    print("Connection error - check your internet")
+else
+    -- result == "invalid!!"
+    local keyUrl = Pelinda.GetKeyLink()
+    print("Get your key at: " .. keyUrl)
+
+    -- Optionally kick the player
+    game.Players.LocalPlayer:Kick("Invalid Key - Please get a valid key")
+end
+```
+
+## Keyless Access (Optional)
+
+If your service has keyless access enabled, users can be validated by their HWID alone without needing a key.
+
+<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+  <Fingerprint size={18} aria-hidden="true" />
+  <strong>HWID-only flow</strong>
+</div>
+
+```lua
+-- V3 also supports keyless access (if enabled for your service)
+-- Users are validated by HWID only
+
+local result = Pelinda.Init({
+    SilentMode = true, -- No notifications
+    -- No key needed if keyless access is enabled
+})
+
+if result == "validated!!" then
+    print("Keyless access granted!")
+    print("Is Keyless:", __PELINDA_IS_KEYLESS__)
+    -- Proceed with your script
+end
+```
+
+## Available Functions
+
+### `Pelinda.Init(content)`
+
+Initializes and validates the user with the Panda Key System using encrypted V3 protocol. Returns a string result and sets global variables with key info.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `content` | `table` | Configuration table with `Key` (optional), `Silent` (boolean), `Service` (auto-injected by Virtual Storage). |
+
+**Returns**
+
+| Type | Value | Meaning |
+| --- | --- | --- |
+| `string` | `"validated!!"` | Key is valid, globals are set. |
+| `string` | `"invalid!!"` | Key is invalid or expired. |
+| `string` | `"error!!"` | Connection or server error. |
+
+**Global variables set on success**
+
+| Variable | Type |
+| --- | --- |
+| `__PELINDA_KEY_EXPIRES_AT__` | `string` or `"N/A"` |
+| `__PELINDA_KEY_HWID__` | `string` |
+| `__PELINDA_IS_PREMIUM__` | `boolean` |
+| `__PELINDA_IS_KEYLESS__` | `boolean` |
+
+### `Pelinda.GetKeyLink()`
+
+Returns the GetKey page URL with the user's HWID. Service ID is auto-injected by Virtual Storage.
+
+**Parameters**
+
+None.
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `string` | The full GetKey URL. |
+
+<Aside type="caution">
+  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', fontWeight: 600 }}>
+    <Lock size={18} aria-hidden="true" />
+    <span>Important Notes</span>
+  </div>
+
+  - The V3 library source code is not publicly available.
+  - Library must be injected through Virtual Storage; direct usage is not supported.
+  - Service ID is automatically configured during Virtual Storage upload.
+  - All validation requests are encrypted end-to-end.
+  - Compatible with both Luraph and IB1 obfuscators.
+  - Always handle the `"error!!"` return for network failures.
+</Aside>

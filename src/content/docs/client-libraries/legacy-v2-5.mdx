@@ -1,0 +1,339 @@
+---
+title: Legacy v2.5
+description: Legacy Lua library for Roblox script integration.
+---
+
+import { Badge, Steps } from '@astrojs/starlight/components';
+import { History, Zap, Code2, Terminal, Webhook, Info, FileJson } from 'lucide-react';
+
+<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+  <History size={24} aria-hidden="true" />
+  <strong>Legacy v2.5</strong>
+</div>
+
+<Badge text="Legacy" variant="danger" /> <Badge text="v2.5" variant="note" />
+
+:::caution
+Legacy v2.5 is maintained for older integrations. New projects should prefer newer client libraries.
+:::
+
+## Quick Start
+
+<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+  <Zap size={20} aria-hidden="true" />
+  <strong>Setup</strong>
+</div>
+
+Integrate Panda Key System into your Roblox scripts using our Legacy Lua library. This library provides easy-to-use functions for key validation and user authentication.
+
+<Steps>
+1. Copy the Library
+
+   Copy the entire library code below and paste it at the top of your script. Replace `YOUR_SERVICE_ID` with your actual service identifier from the dashboard.
+
+   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem', marginBottom: '0.35rem' }}>
+     <Terminal size={20} aria-hidden="true" />
+     <strong>Legacy Lua Client</strong>
+   </div>
+
+   ```lua
+   --[[
+       Panda Key System - Legacy Roblox Client
+       https://pandadevelopment.net
+   ]]
+
+   local BaseURL = "https://new.pandadevelopment.net/api/v1"
+   local Client_ServiceID = "YOUR_SERVICE_ID"
+
+   -- Get Hardware ID
+   local function getHardwareID()
+       local success, hwid = pcall(gethwid)
+       if success and hwid then
+           return hwid
+       end
+
+       -- Fallback to analytics client ID
+       local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+       local clientId = tostring(RbxAnalyticsService:GetClientId())
+       return clientId:gsub("-", "")
+   end
+
+   -- HTTP Request wrapper
+   local function makeRequest(endpoint, body)
+       local HttpService = game:GetService("HttpService")
+
+       local url = BaseURL .. endpoint
+       local jsonBody = HttpService:JSONEncode(body)
+
+       local response = request({
+           Url = url,
+           Method = "POST",
+           Headers = {
+               ["Content-Type"] = "application/json"
+           },
+           Body = jsonBody
+       })
+
+       if response and response.Body then
+           return HttpService:JSONDecode(response.Body)
+       end
+
+       return nil
+   end
+
+   --[[
+       Get Key URL - Opens the key system page
+       @return string - The URL to get a key
+   ]]
+   function GetKeyURL()
+       local hwid = getHardwareID()
+       return "https://new.pandadevelopment.net/getkey/" .. Client_ServiceID .. "?hwid=" .. hwid
+   end
+
+   --[[
+       Open Get Key page in browser
+   ]]
+   function OpenGetKey()
+       local url = GetKeyURL()
+       if setclipboard then
+           setclipboard(url)
+           print("Key URL copied to clipboard: " .. url)
+       end
+       return url
+   end
+
+   --[[
+       Validate a key
+       @param key string - The license key to validate
+       @param Premium_Verification boolean (optional) - If true, requires the key to be premium
+       @return table - { success: boolean, message: string, isPremium: boolean, expireDate: string|nil }
+   ]]
+   function Validate(key, Premium_Verification)
+       local hwid = getHardwareID()
+
+       local result = makeRequest("/keys/validate", {
+           ServiceID = Client_ServiceID,
+           HWID = hwid,
+           Key = key
+       })
+
+       if not result then
+           return {
+               success = false,
+               message = "Failed to connect to server",
+               isPremium = false,
+               expireDate = nil
+           }
+       end
+
+       local isAuthenticated = result.Authenticated_Status == "Success"
+       local isPremium = result.Key_Premium or false
+
+       -- If Premium_Verification is enabled, require both authentication AND premium status
+       local isValid = isAuthenticated
+       local message = result.Note or (isAuthenticated and "Key validated!" or "Invalid key")
+
+       if Premium_Verification and isAuthenticated and not isPremium then
+           isValid = false
+           message = "Premium key required"
+       end
+
+       return {
+           success = isValid,
+           message = message,
+           isPremium = isPremium,
+           expireDate = result.Expire_Date
+       }
+   end
+   ```
+
+2. Use the Functions
+
+   After adding the library, you can use the provided functions to validate keys and redirect users.
+
+   ```lua
+   -- Get the key URL (copies to clipboard)
+   local keyUrl = OpenGetKey()
+   print("Get your key at: " .. keyUrl)
+
+   -- Validate a key (any valid key works)
+   local result = Validate("PANDA-XXXX-XXXX-XXXX-XXXX")
+
+   if result.success then
+       print("Key validated!")
+       print("Premium:", result.isPremium)
+       print("Expires:", result.expireDate or "Never")
+
+       -- Your script code here
+   else
+       print("Validation failed:", result.message)
+       game.Players.LocalPlayer:Kick("Invalid Key")
+   end
+
+   -- Premium-Only Validation (requires premium key)
+   local premiumResult = Validate("PANDA-XXXX-XXXX-XXXX-XXXX", true)
+
+   if premiumResult.success then
+       print("Premium features unlocked!")
+       -- Premium-only features here
+   else
+       print("Premium required:", premiumResult.message)
+       -- Will show "Premium key required" if key is valid but not premium
+   end
+   ```
+</Steps>
+
+:::tip
+Users can get keys from: `https://new.pandadevelopment.net/getkey/YOUR_SERVICE_ID?hwid=USER_HWID`
+:::
+
+## Using the Library
+
+<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+  <Code2 size={20} aria-hidden="true" />
+  <strong>Runtime Flow</strong>
+</div>
+
+- Call `OpenGetKey()` to copy and return the key page URL.
+- Call `Validate(key)` for standard key checks.
+- Call `Validate(key, true)` when your feature requires a premium key.
+- Read `result.success`, `result.message`, `result.isPremium`, and `result.expireDate` for behavior decisions.
+
+## Function Reference
+
+### `Validate(key, Premium_Verification)`
+
+Validates a license key against the Panda Key System server. Optionally requires premium status.
+
+**Parameters**
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | Yes | The license key to validate. |
+| `Premium_Verification` | `boolean` | No | If `true`, requires both valid key and premium status. |
+
+**Returns**
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `success` | `boolean` | Validation result. |
+| `message` | `string` | Human-readable outcome. |
+| `isPremium` | `boolean` | Whether the key has premium status. |
+| `expireDate` | `string \| nil` | Expiration date from API response, or `nil`. |
+
+Return object shape:
+
+```lua
+{
+  success = boolean,
+  message = string,
+  isPremium = boolean,
+  expireDate = string or nil
+}
+```
+
+Behavior notes:
+
+- If `Premium_Verification` is `nil` or `false`, key is validated normally.
+- If `Premium_Verification` is `true`, both valid key and premium status are required.
+- If key is valid but not premium in premium mode, message becomes `"Premium key required"`.
+
+### `GetKeyURL()`
+
+Returns the GetKey page URL with the user's HWID appended.
+
+**Parameters**
+
+None.
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `string` | The full GetKey URL. |
+
+### `OpenGetKey()`
+
+Gets the GetKey URL and copies it to the user's clipboard (if available).
+
+**Parameters**
+
+None.
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `string` | The full GetKey URL. |
+
+## API Responses
+
+<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+  <Webhook size={20} aria-hidden="true" />
+  <strong>Validate Key Endpoint</strong>
+</div>
+
+```http
+POST /api/v1/keys/validate
+Content-Type: application/json
+
+{
+  "ServiceID": "your-service-id",
+  "HWID": "user-hardware-id",
+  "Key": "PANDA-XXXX-XXXX-XXXX-XXXX"
+}
+```
+
+<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem', marginBottom: '0.35rem' }}>
+  <FileJson size={18} aria-hidden="true" />
+  <strong>Success Response</strong>
+</div>
+
+```json
+{
+  "Authenticated_Status": "Success",
+  "Note": "Key validated successfully",
+  "Expire_Date": "2024-12-31T23:59:59.000Z",
+  "Key_Premium": true
+}
+```
+
+<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem', marginBottom: '0.35rem' }}>
+  <FileJson size={18} aria-hidden="true" />
+  <strong>Failed Response</strong>
+</div>
+
+```json
+{
+  "Authenticated_Status": "Failed",
+  "Note": "Invalid key",
+  "Expire_Date": null,
+  "Key_Premium": false
+}
+```
+
+<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem', marginBottom: '0.35rem' }}>
+  <FileJson size={18} aria-hidden="true" />
+  <strong>Premium Required Response</strong>
+</div>
+
+```json
+{
+  "success": false,
+  "message": "Premium key required",
+  "isPremium": false,
+  "expireDate": "2024-12-31T23:59:59.000Z"
+}
+```
+
+<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem', marginBottom: '0.35rem' }}>
+  <Info size={18} aria-hidden="true" />
+  <strong>Response Fields</strong>
+</div>
+
+| Field | Description |
+| --- | --- |
+| `Authenticated_Status` | `"Success"` or `"Failed"` indicating validation result. |
+| `Note` | Human-readable message about validation result. |
+| `Expire_Date` | ISO 8601 date string or `null` for lifetime keys. |
+| `Key_Premium` | Boolean indicating premium status. |

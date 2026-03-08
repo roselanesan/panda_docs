@@ -1,40 +1,70 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
-template: splash # Remove or comment out this line to display the site sidebar on this page.
+title: Panda Key System Documentation
+description: Start here to choose the right docs path for setup, integration, and API automation.
+template: splash
 hero:
-  tagline: Congrats on setting up a new Starlight project!
+  tagline: Everything you need to upload scripts, integrate libraries, and automate with the Web API.
   image:
-    file: ../../assets/houston.webp
+    file: ../../assets/panda.webp
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: Start With VSS Overview
+      link: /vss/vss-overview/
       icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
-      icon: external
+    - text: Open Dashboard API
+      link: /web-api/dashboard-api/
+      icon: right-arrow
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid, Steps, Badge } from '@astrojs/starlight/components';
 
-## Next steps
+## Choose Your Path
+
+Use this quick guide to decide what to read first based on your goal.
+
+<Badge text="New Here" variant="tip" /> <Badge text="Recommended Order" />
+
+<Steps>
+1. Read `VSS Overview`
+
+   Learn how uploads, obfuscation, library injection, version history, and deployment flow work.
+
+2. Pick your `Client Library`
+
+   Use `V4-HyperGuard` for current integrations, `V3` for stable legacy setups, and `Legacy v2.5` only for older compatibility.
+
+3. Use `Web API` for automation
+
+   Generate keys, manage blacklist/keyless entries, and fetch service analytics programmatically.
+</Steps>
 
 <CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Change page layout" icon="document">
-		Delete `template: splash` in `src/content/docs/index.mdx` to display a
-		sidebar on this page.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
+  <Card title="VSS" icon="rocket">
+    Start here if you need the full upload-to-distribution workflow.
+
+    [Open VSS Overview](/vss/vss-overview/)
+  </Card>
+
+  <Card title="Client Libraries" icon="box">
+    Library-specific implementation guides for your script runtime.
+
+    [Open V4-HyperGuard](/client-libraries/v4-hyperguard/)
+    [Open V3 Library](/client-libraries/v3-library/)
+    [Open Legacy v2.5](/client-libraries/legacy-v2-5/)
+  </Card>
+
+  <Card title="Web API" icon="server">
+    REST API docs for dashboard automation and backend integrations.
+
+    [Open Overview](/web-api/overview/)
+    [Open Dashboard API](/web-api/dashboard-api/)
+  </Card>
+
+  <Card title="Fast Track" icon="lightning-bolt">
+    If you only need a working setup quickly:
+
+    1. VSS Overview
+    2. V4-HyperGuard
+    3. Dashboard API
+  </Card>
 </CardGrid>

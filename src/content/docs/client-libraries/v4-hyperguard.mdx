@@ -1,0 +1,197 @@
+---
+title: V4-HyperGuard
+description: Advanced security with multi-layer protection
+---
+
+import { Card, CardGrid, Steps, Badge, Aside } from '@astrojs/starlight/components';
+import { ShieldCheck, Fingerprint, Cpu, BadgeCheck } from 'lucide-react';
+
+<Badge text="Recommended" variant="tip" /> <Badge text="Anti-Tamper" variant="danger" /> <Badge text="HMAC Signed" /> <Badge text="Encrypted" />
+
+## Key Features
+
+<Aside type="note" title="Key Features" icon="rocket">
+Core security capabilities of the `PandaV4Lite` runtime.
+</Aside>
+
+<CardGrid>
+  <Card>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+      <ShieldCheck size={18} aria-hidden="true" />
+      <span>Advanced Security</span>
+    </div>
+    Multi-layer protection with session-based validation and HMAC signing.
+  </Card>
+  <Card>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+      <Fingerprint size={18} aria-hidden="true" />
+      <span>HWID Binding</span>
+    </div>
+    Hardware-based authentication prevents key sharing.
+  </Card>
+  <Card>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+      <Cpu size={18} aria-hidden="true" />
+      <span>Anti-Tamper</span>
+    </div>
+    Runtime integrity checks with built-in honeypot detection.
+  </Card>
+  <Card>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+      <BadgeCheck size={18} aria-hidden="true" />
+      <span>Real-time Validation</span>
+    </div>
+    Instant key verification with encrypted protocol.
+  </Card>
+</CardGrid>
+
+## Integration
+
+<Aside type="note" icon="information" title="Integration">
+The V4-HyperGuard library is automatically injected via VSS. The global `PandaV4Lite` object is available immediately; no initialization or service identifier required. VSS handles everything automatically.
+</Aside>
+
+<Steps>
+1. Upload to Virtual Storage
+
+   Go to Virtual Storage in your dashboard, upload your Lua script, and select `V4-HyperGuard` as the library.
+
+2. Automatic Injection
+
+   The library is injected at the top of your script. The service identifier and HWID detection are all set automatically; no manual config needed.
+
+3. Use the API
+
+   Call `PandaV4Lite.validate(key)` to validate keys. The library handles all encryption, HMAC signing, and session management.
+</Steps>
+
+## Sample Usage
+
+```lua
+-- ____________________________________________________________________________________________
+-- Use this Script on V4-HyperGuard, V4-HyperGuard doesn't need Initialize.
+-- ____________________________________________________________________________________________
+local function Panda_V4_GetKey()
+  local getkeyurlz = _getBaseUrl() .. "/getkey/" .. CONFIG_SERVICE_ID .. "?hwid=" .. getHWID()
+  return getkeyurlz
+end
+
+local function Panda_V4_Validate(Keys)
+  return PandaV4Lite.validate(Keys).success
+end
+
+local function Panda_V4_Validate_Premium(Keys)
+  local result = PandaV4Lite.validate(Keys)
+  return result.success and result.isPremium
+end
+
+-- ==================== MAIN FLOW ====================
+local MY_KEY = "unlimited86575263e18a94653f99647d9"
+
+-- Get Key
+setclipboard(Panda_V4_GetKey())
+
+-- Validate Key
+if Panda_V4_Validate(MY_KEY) then
+  print("[MyScript] - Authenticated!")
+else
+  warn("[MyScript] - Auth failed: ")
+end
+```
+
+## Keyless Access (Optional)
+
+If your service has keyless access enabled, users can be validated by their HWID alone without needing a key.
+
+```lua
+-- Keyless mode: validate by HWID only (no key needed)
+-- Make sure Keyless Access is enabled in your service settings
+
+local result = PandaV4Lite.validate("keyless")
+
+if result.success then
+    _print("[PandaAuth] - Keyless access granted!")
+    -- Your script code here
+else
+    _print("[PandaAuth] - Access denied: " .. (result.error or "Unknown"))
+end
+```
+
+## Get Key URL
+
+Use `PandaV4Lite.copyGetKeyUrl()` to copy the key generation URL to the user's clipboard. The service identifier and HWID are injected automatically.
+
+```lua
+-- Copy the GetKey URL to the user's clipboard
+-- The service identifier and HWID are handled automatically by VSS
+
+local result = PandaV4Lite.copyGetKeyUrl()
+
+if result.success then
+    _print("GetKey URL copied to clipboard!")
+    _print("URL: " .. result.url)
+end
+```
+
+## Available Functions
+
+### `PandaV4Lite.validate(key)`
+
+Validates a license key against the Panda Key System with HMAC-signed session-based authentication. The service identifier is automatically injected by VSS; no need to pass it.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `key` | `string` | The user's license key, or `"keyless"` for keyless mode. |
+
+**Returns**
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `result.success` | `boolean` | Whether validation passed. |
+| `result.isPremium` | `boolean` | Whether the key is premium. |
+| `result.expiresAt` | `string \| nil` | ISO 8601 expiration date, or `nil`. |
+| `result.error` | `string \| nil` | Error message if validation failed. |
+
+### `PandaV4Lite.copyGetKeyUrl()`
+
+Returns and copies the GetKey page URL to the user's clipboard. The service identifier and HWID are injected automatically by VSS.
+
+**Returns**
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `result.success` | `boolean` | Whether the URL was generated. |
+| `result.url` | `string` | The full GetKey URL. |
+
+### `PandaV4Lite.getVersion()`
+
+Returns the current version string of the V4-HyperGuard library.
+
+**Returns**
+
+| Value | Type | Description |
+| --- | --- | --- |
+| Library version | `string` | Library version (e.g. `"4.0.1"`). |
+
+:::tip[HyperGuard Protection Capabilities]
+`shield-check`
+
+- Session-based validation with HMAC signing; no client-side RSA.
+- Secure handshake protocol with built-in honeypot detection.
+- Anti-tamper runtime integrity checks.
+- Lightweight and fast; minimal impact on script execution.
+- Service identifier and HWID injected automatically by VSS.
+- Compatible with Luraph and IB1 obfuscators.
+:::
+
+:::caution[Important Notes]
+`warning`
+
+- The V4-HyperGuard library source code is not publicly available.
+- Library must be injected through Virtual Storage; direct usage is not supported.
+- Service identifier is automatically configured during Virtual Storage upload; do not pass it manually.
+- All validation requests are encrypted end-to-end with HMAC signing.
+- V4-HyperGuard replaces V3 as the recommended library for all new projects.
+:::

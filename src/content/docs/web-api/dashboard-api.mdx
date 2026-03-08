@@ -1,0 +1,527 @@
+---
+title: Dashboard API
+description: Complete REST API for managing Panda Key System services.
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+import {
+  Gauge,
+  KeyRound,
+  Ban,
+  Fingerprint,
+  Activity,
+  Webhook,
+  Bot,
+  AlertTriangle,
+  Timer,
+} from 'lucide-react';
+
+export const SectionTag = ({ icon: Icon, label }) => (
+  <div
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '0.45rem',
+      marginBottom: '0.7rem',
+      padding: '0.2rem 0.55rem',
+      border: '1px solid var(--sl-color-gray-5)',
+      borderRadius: '999px',
+      fontSize: '0.85rem',
+      color: 'var(--sl-color-text-accent)',
+      background: 'var(--sl-color-bg-inline-code)',
+      fontWeight: 600,
+    }}
+  >
+    <Icon size={13} aria-hidden="true" />
+    <span>{label}</span>
+  </div>
+);
+
+<div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', marginBottom: '0.6rem' }}>
+  <Gauge size={18} aria-hidden="true" />
+  <strong>Dashboard API</strong>
+</div>
+
+Programmatic access to key management, blacklist controls, keyless entries, service analytics, execution tracking, and webhooks.
+
+## Overview
+
+<Aside type="note" title="Authentication">
+All endpoints require:
+
+```http
+X-API-Key: your-api-key-here
+```
+
+Base URL:
+
+```text
+https://new.pandadevelopment.net/api/v1
+```
+</Aside>
+
+## Key Management
+
+<SectionTag icon={KeyRound} label="Keys" />
+
+### Generate Keys
+
+`POST /keys/api/generate`
+
+```json
+{
+  "count": 5,
+  "expirationType": "byDays",
+  "expirationDays": 30,
+  "isPremium": false
+}
+```
+
+Parameters:
+
+- `count` (integer, `1-100`)
+- `expirationType` (`byDays` | `byDate` | `lifetime`)
+- `expirationDays` (integer, required for `byDays`)
+- `expirationDate` (ISO string, required for `byDate`)
+- `isPremium` (boolean, optional, default `false`)
+
+Response (`201`):
+
+```json
+{
+  "success": true,
+  "message": "5 keys generated successfully",
+  "data": {
+    "keys": [
+      {
+        "id": "clx...",
+        "value": "PANDA-XXXX-XXXX-XXXX-XXXX",
+        "isPremium": false,
+        "expiresAt": "2026-03-08T...",
+        "createdAt": "2026-02-06T..."
+      }
+    ]
+  }
+}
+```
+
+### Lookup Key
+
+`GET /keys/api/key?key=PANDA-XXXX-XXXX-XXXX-XXXX`
+
+```json
+{
+  "success": true,
+  "data": {
+    "key": {
+      "id": "clx...",
+      "value": "PANDA-XXXX-XXXX-XXXX-XXXX",
+      "hwid": "ABC123DEF456",
+      "isPremium": false,
+      "expiresAt": "2026-03-08T...",
+      "createdAt": "2026-02-06T...",
+      "boundAt": "2026-02-06T...",
+      "lastUsedAt": "2026-02-06T..."
+    }
+  }
+}
+```
+
+### Delete Key
+
+`DELETE /keys/api/key`
+
+```json
+{
+  "key": "PANDA-XXXX-XXXX-XXXX-XXXX"
+}
+```
+
+```json
+{
+  "success": true,
+  "message": "Key deleted successfully"
+}
+```
+
+### Reset Key HWID
+
+`PATCH /keys/api/key/hwid`
+
+```json
+{
+  "key": "PANDA-XXXX-XXXX-XXXX-XXXX"
+}
+```
+
+```json
+{
+  "success": true,
+  "message": "HWID reset successfully"
+}
+```
+
+## Blacklist Management
+
+<SectionTag icon={Ban} label="Blacklist" />
+
+### Add to Blacklist
+
+`POST /keys/api/blacklist`
+
+```json
+{
+  "hwid": "ABC123DEF456",
+  "reason": "Violation of terms"
+}
+```
+
+```json
+{
+  "success": true,
+  "message": "HWID blacklisted successfully",
+  "data": {
+    "entry": {
+      "id": "clx...",
+      "hwid": "ABC123DEF456",
+      "reason": "Violation of terms",
+      "createdAt": "2026-02-06T..."
+    }
+  }
+}
+```
+
+### Remove from Blacklist
+
+`DELETE /keys/api/blacklist`
+
+```json
+{
+  "hwid": "ABC123DEF456"
+}
+```
+
+```json
+{
+  "success": true,
+  "message": "HWID removed from blacklist"
+}
+```
+
+### Check if Blacklisted
+
+`GET /keys/api/blacklist/check?hwid=ABC123DEF456`
+
+```json
+{
+  "success": true,
+  "data": {
+    "isBlacklisted": true,
+    "reason": "Violation of terms",
+    "createdAt": "2026-02-06T..."
+  }
+}
+```
+
+## Keyless Access Management
+
+<SectionTag icon={Fingerprint} label="Keyless" />
+
+### Add Keyless Entry
+
+`POST /keys/api/keyless`
+
+```json
+{
+  "hwid": "ABC123DEF456",
+  "isPremium": false,
+  "expiresAt": "2026-12-31T23:59:59Z"
+}
+```
+
+```json
+{
+  "success": true,
+  "message": "HWID whitelisted successfully",
+  "data": {
+    "entry": {
+      "id": "clx...",
+      "hwid": "ABC123DEF456",
+      "isPremium": false,
+      "expiresAt": "2026-12-31T23:59:59.000Z",
+      "createdAt": "2026-02-12T00:00:00.000Z"
+    }
+  }
+}
+```
+
+### Delete Keyless Entry
+
+`DELETE /keys/api/keyless`
+
+```json
+{
+  "hwid": "ABC123DEF456"
+}
+```
+
+## Service Info
+
+<SectionTag icon={Activity} label="Analytics" />
+
+### Get Service Details
+
+`GET /keys/api/service/info`
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "clx...",
+    "name": "My Service",
+    "identifier": "myservice",
+    "isActive": true,
+    "totalExecutions": 15432,
+    "lastActiveAt": "2026-02-10T...",
+    "createdAt": "2025-11-01T...",
+    "settings": {
+      "keyPrefix": "MYPREFIX",
+      "keyFormat": "SEGMENTED",
+      "checkpointCount": 2,
+      "keyExpirationTime": 24,
+      "revenueMode": "LINKVERTISE",
+      "keylessMode": false,
+      "hwidVerification": true,
+      "multiAccountEnabled": false,
+      "sessionLimitEnabled": false
+    }
+  }
+}
+```
+
+### Get Service Status
+
+`GET /keys/api/service/status`
+
+```json
+{
+  "success": true,
+  "data": {
+    "activeKeys": 142,
+    "generatedKeys": 58,
+    "keylessEntries": 23,
+    "blacklistedHwids": 7,
+    "totalExecutions": 15432,
+    "lastActiveAt": "2026-02-10T..."
+  }
+}
+```
+
+## Execution Tracking
+
+### Increment Execution Count
+
+`POST /keys/api/execution` (rate limited to 60 req/min)
+
+```json
+{
+  "success": true,
+  "message": "Execution count incremented",
+  "data": { "totalExecutions": 15433 }
+}
+```
+
+### Get Execution Count
+
+`GET /keys/api/execution`
+
+```json
+{
+  "success": true,
+  "data": {
+    "totalExecutions": 15433,
+    "lastActiveAt": "2026-02-10T..."
+  }
+}
+```
+
+## Webhook Send
+
+<SectionTag icon={Webhook} label="Webhook API" />
+
+### Send Webhook Message
+
+`POST /keys/api/webhook` (rate limited to 5 req/min)
+
+```json
+{
+  "content": "User abc123 just validated!",
+  "username": "My Bot"
+}
+```
+
+Parameters:
+
+- `content` (string, required)
+- `username` (string, optional, defaults to service name)
+
+```json
+{
+  "success": true,
+  "message": "Webhook sent successfully"
+}
+```
+
+## Discord Bot Example
+
+<SectionTag icon={Bot} label="Node.js Example" />
+
+```javascript
+const axios = require('axios');
+
+const API_BASE = 'https://new.pandadevelopment.net/api/v1';
+const API_KEY = 'your-api-key-here';
+const headers = { 'X-API-Key': API_KEY };
+
+async function generateKey(days, isPremium) {
+    const response = await axios.post(`${API_BASE}/keys/api/generate`, {
+        count: 1,
+        expirationType: 'byDays',
+        expirationDays: days,
+        isPremium: isPremium
+    }, { headers });
+    return response.data.data.keys[0];
+}
+
+async function lookupKey(keyValue) {
+    const response = await axios.get(
+        `${API_BASE}/keys/api/key?key=${keyValue}`,
+        { headers }
+    );
+    return response.data.data.key;
+}
+
+async function deleteKey(keyValue) {
+    const response = await axios.delete(`${API_BASE}/keys/api/key`, {
+        headers,
+        data: { key: keyValue }
+    });
+    return response.data;
+}
+
+async function blacklistHwid(hwid, reason) {
+    const response = await axios.post(`${API_BASE}/keys/api/blacklist`, {
+        hwid, reason
+    }, { headers });
+    return response.data;
+}
+
+async function getStats() {
+    const response = await axios.get(
+        `${API_BASE}/keys/api/service/status`,
+        { headers }
+    );
+    return response.data.data;
+}
+
+client.on('messageCreate', async (message) => {
+    const args = message.content.split(' ');
+
+    if (args[0] === '!genkey') {
+        const days = parseInt(args[1]) || 7;
+        const key = await generateKey(days, false);
+        message.reply(`Generated: ||${key.value}|| (expires: ${key.expiresAt})`);
+    }
+
+    if (args[0] === '!lookup') {
+        const key = await lookupKey(args[1]);
+        message.reply(`Key: ${key.value}\nHWID: ${key.hwid || 'Unbound'}\nPremium: ${key.isPremium}\nExpires: ${key.expiresAt}`);
+    }
+
+    if (args[0] === '!stats') {
+        const stats = await getStats();
+        message.reply(`Active: ${stats.activeKeys} | Generated: ${stats.generatedKeys} | Executions: ${stats.totalExecutions}`);
+    }
+
+    if (args[0] === '!blacklist') {
+        const result = await blacklistHwid(args[1], args.slice(2).join(' ') || 'No reason');
+        message.reply(result.success ? 'User blacklisted!' : 'Failed');
+    }
+});
+```
+
+## Webhooks
+
+Setup:
+
+1. Go to service `Settings -> General`
+2. Enable Discord Webhook
+3. Paste webhook URL
+4. Click Test
+5. Save settings
+
+Example payload (`key.validated` style event):
+
+```json
+{
+  "username": "Your Service Name",
+  "avatar_url": "https://your-service-logo.png",
+  "embeds": [
+    {
+      "title": "Key Validated",
+      "description": "**Key:** `PANDA-****-****-XXXX`\n**HWID:** `ABC123DEF456`\n**Type:** Premium\n**Expires:** February 27, 2026\n**Status:** Key validated!",
+      "color": 1096801,
+      "timestamp": "2026-01-28T15:45:00.000Z",
+      "footer": {
+        "text": "Your Service Name",
+        "icon_url": "https://your-service-logo.png"
+      }
+    }
+  ]
+}
+```
+
+## Error Responses
+
+The source page includes an Error Responses section, but the extracted table values were not expanded in the fetched content.
+
+## Rate Limits
+
+<SectionTag icon={Timer} label="Rate Limits" />
+
+- General API: `30 requests/minute`
+- Execution tracking: `60 requests/minute`
+- Webhook send: `5 requests/minute`
+
+<Aside type="caution" title="429 Responses">
+If you exceed the endpoint limit window, the API returns HTTP `429`.
+</Aside>
+
+## Response Samples
+
+<Tabs>
+  <TabItem label="Success Response">
+    <pre><code className="language-json">{`{
+  "Authenticated_Status": "Success",
+  "Note": "Key validated successfully",
+  "Expire_Date": "2024-12-31T23:59:59.000Z",
+  "Key_Premium": true
+}`}</code></pre>
+  </TabItem>
+  <TabItem label="Failed Response">
+    <pre><code className="language-json">{`{
+  "Authenticated_Status": "Failed",
+  "Note": "Invalid key",
+  "Expire_Date": null,
+  "Key_Premium": false
+}`}</code></pre>
+  </TabItem>
+  <TabItem label="Premium Required">
+    <pre><code className="language-json">{`{
+  "success": false,
+  "message": "Premium key required",
+  "isPremium": false,
+  "expireDate": "2024-12-31T23:59:59.000Z"
+}`}</code></pre>
+  </TabItem>
+</Tabs>

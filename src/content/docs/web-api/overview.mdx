@@ -1,0 +1,99 @@
+---
+title: Web API Overview
+description: REST API overview for managing keys, blacklists, and service data.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import { Globe, KeyRound, ShieldCheck, Server, Gauge } from 'lucide-react';
+
+export const Chip = ({ icon: Icon, label }) => (
+  <span
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '0.35rem',
+      border: '1px solid var(--sl-color-gray-5)',
+      borderRadius: '999px',
+      padding: '0.2rem 0.55rem',
+      marginRight: '0.4rem',
+      marginBottom: '0.4rem',
+      fontSize: '0.85rem',
+      color: 'var(--sl-color-text-accent)',
+      background: 'var(--sl-color-bg-inline-code)',
+    }}
+  >
+    <Icon size={13} aria-hidden="true" />
+    {label}
+  </span>
+);
+
+<div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', marginBottom: '0.6rem' }}>
+  <Globe size={18} aria-hidden="true" />
+  <strong>Overview</strong>
+</div>
+
+The Panda Key System Web API lets you manage your service programmatically through HTTP requests.
+
+<Chip icon={KeyRound} label="API Key Required" />
+<Chip icon={Server} label="REST Endpoints" />
+<Chip icon={Gauge} label="Dashboard Automation" />
+
+## Overview
+
+All API endpoints require authentication and are designed for backend scripts, bots, and dashboard automation.
+
+## Available APIs
+
+### Dashboard API
+
+Complete REST API for:
+
+- Key generation and lookup
+- Key deletion and HWID reset
+- Blacklist management
+- Keyless access management
+- Service analytics and execution tracking
+- Webhook sends
+
+## Authentication
+
+<Aside type="note" title="Required Header">
+Include your service API key in every request:
+
+```http
+X-API-Key: your-api-key-here
+```
+
+You can find this key in your service dashboard settings.
+</Aside>
+
+## Base URL
+
+```text
+https://new.pandadevelopment.net/api/v1
+```
+
+## Quick Request Template
+
+```http
+GET /keys/api/service/status
+X-API-Key: your-api-key-here
+```
+
+```json
+{
+  "success": true,
+  "data": {
+    "activeKeys": 142,
+    "generatedKeys": 58,
+    "keylessEntries": 23,
+    "blacklistedHwids": 7,
+    "totalExecutions": 15432,
+    "lastActiveAt": "2026-02-10T..."
+  }
+}
+```
+
+## Related
+
+- Continue to `Dashboard API` for full endpoint reference.
