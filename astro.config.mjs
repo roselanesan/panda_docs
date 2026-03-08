@@ -6,6 +6,8 @@ import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
+    site: 'https://roselanesan.github.io',
+    base: '/panda_docs',
     integrations: [starlight({
         title: 'Panda Key System',
         social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/roselanesan/panda_docs' }],
