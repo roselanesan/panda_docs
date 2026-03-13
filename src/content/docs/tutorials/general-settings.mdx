@@ -1,0 +1,157 @@
+---
+title: General Settings
+description: Configure your service identity, key format, webhook notifications, and checkpoint behavior.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Configure your service identity, key format, webhook notifications, and checkpoint behavior. Navigate to your service → `General Settings` to access these options. The page is divided into three tabs: **Hub Details**, **Appearance**, and **Checkpoint Settings**.
+
+## Hub Details Tab
+
+Basic information about your service and how it appears to users.
+
+- **Service Name**
+  The display name shown in the navbar of your GetKey page, the dashboard sidebar, and webhook notifications. You can change this anytime without affecting your keys or URLs. Example: “Premium ESP Hub”, “My Script V2”.
+
+- **Identifier**
+  A globally unique alphanumeric slug that forms your GetKey URL: `/getkey/{identifier}`. Only lowercase letters and numbers are allowed (3-30 characters). The system checks availability in real-time as you type — a green checkmark means it's available, a red X means taken.
+
+  :::caution[Warning]
+  Changing the identifier updates ALL your GetKey URLs. Any existing links your users have bookmarked will break. Only the service owner (not contributors) can change this field.
+  :::
+
+- **Discord URL**
+  Your Discord server invite link (e.g., `https://discord.gg/yourserver`). This is displayed on the GetKey page so users can reach your community for support. Leave empty if you don't have a Discord server.
+
+- **Key Prefix**
+  A short string (max 10 characters) prepended to every generated key. Automatically uppercased. This lets you brand your keys. Examples:
+  - Prefix `VIP` → keys look like `VIP-A8F3-K9X2-M7B4`
+  - Prefix `PANDA` → keys look like `PANDA-X2M7-B4A8-F3K9`
+
+- **Key Format**
+  Choose how generated keys are formatted:
+  - **Segmented** — `PREFIX-XXXX-XXXX-XXXX` (4 segments of 4 uppercase alphanumeric characters separated by dashes). Clean, easy to read and copy. Recommended for most use cases.
+  - **Random** — `prefixa8f3k9x2m7b4n6p...` (prefix in lowercase followed by 25 random lowercase alphanumeric characters). Harder to guess but less readable.
+
+## Discord Webhook
+
+Get real-time Discord notifications whenever key events happen in your service (key validated, key generated, blacklist changes, HWID resets). Located at the bottom of the Hub Details tab.
+
+<Steps>
+
+1. **Create a Webhook in Discord**
+   
+   Open your Discord server → **Server Settings** → **Integrations** → **Webhooks** → **New Webhook**. Choose a channel (e.g., #key-logs), name the webhook, and click **Copy Webhook URL**.
+
+2. **Enable & Paste in Dashboard**
+   
+   Toggle `Discord Webhook` on. Paste the copied URL into the webhook URL field.
+
+3. **Choose a Format Mode**
+   
+   - **Auto (Styled)** — The system automatically sends beautiful rich embeds with color-coded events, icons, and formatted data. No configuration needed. This is the recommended mode for most users.
+   - **Manual (Custom)** — You write your own message template using placeholder variables. The system replaces variables with actual values before sending. Use this if you want full control over the format.
+
+4. **Test Your Webhook**
+   
+   Click the `Test` button to send a test embed to your Discord channel. If you see the message, everything is working.
+
+</Steps>
+
+:::tip[Available Template Variables (Manual Mode)]
+Use these placeholders in your custom template. They get replaced with real values when the webhook fires:
+- `{{key}}` — Full key value (e.g., PANDA-A8F3-K9X2)
+- `{{key_masked}}` — Partially hidden (e.g., PANDA-****-****-K9X2)
+- `{{hwid}}` — User's Hardware ID
+- `{{expires}}` — Key expiration date/time
+- `{{timestamp}}` — When the event occurred
+- `{{event_icon}}` — Emoji representing the event type
+- `{{event_title}}` — Human-readable event name
+- `{{type_emoji}}` — Key type indicator (free/premium)
+- `{{separator}}` — A visual divider line (────)
+- `{{service_name}}` — Your service display name
+:::
+
+## GetKey Options
+
+Toggles and options that control user-facing features on the GetKey page:
+
+- **Allow Permanent Link**
+  When enabled, users can generate a permanent bookmark URL that includes their HWID. This means they don't have to copy-paste the HWID manually each time — they just visit their saved link. Useful for convenience, but means the link is device-specific.
+
+- **Key Extend**
+  When enabled, users who already have an active (non-expired) key can extend its duration by completing a smaller number of checkpoints instead of redoing the entire GetKey flow. This is a great user experience improvement. When you enable this toggle, two sub-settings appear:
+  - **Addon Checkpoints** (1-10) — How many checkpoints the user must complete to earn the extension. Typically set lower than the main checkpoint count (e.g., 1 checkpoint to extend vs. 3 for a new key).
+  - **Addon Time** (1-168 hours) — How many hours are added to the existing key's expiration. For example, if set to 12, extending a key that expires in 2 hours would push it to 14 hours.
+
+- **Custom Button**
+  Adds a custom button to the GetKey page with a configurable label and URL. Useful for linking to external pages such as a “Buy Permanent Key” store, a donation page, or any other resource you want to promote. When enabled, two sub-settings appear:
+  - **Button Label** — The text displayed on the button (e.g., “Buy Permanent Key Here”).
+  - **URL Link** — The URL the button links to. Opens in a new tab when clicked.
+
+## Checkpoint Settings Tab
+
+Controls the core mechanics of how users obtain keys. These settings directly impact user experience and revenue.
+
+- **Auth Type**
+  Determines how the system identifies users during the GetKey flow. This affects session tracking and key binding:
+  - **IP Address** — Identifies users by their IP address only. Simplest but least secure — users behind the same NAT/VPN share an IP. Use only when HWID isn't available.
+  - **HWID Only** — Identifies by Hardware ID, a unique device fingerprint. **Recommended for most Roblox scripts** since your client library provides the HWID automatically.
+  - **HWID + IP** — Both the HWID and IP must match. Most strict — prevents sharing keys across networks. May cause issues for users with dynamic IPs.
+  - **Fingerprint** — Uses browser fingerprinting for identification. Works without a script-provided HWID but is less reliable than actual HWID.
+
+- **Expiration Time (hours)**
+  How long a generated key remains valid after creation. Range: 1-168 hours (1 hour to 7 days). Once expired, the user must complete GetKey again. Common values:
+  - **24 hours** — Most popular, daily key renewal
+  - **48 hours** — Less annoying for users, less revenue per user
+  - **1 hour** — Maximum monetization, but very aggressive
+
+- **Checkpoints (1-10)**
+  The number of monetization links (ads) a user must complete to receive a key. Each checkpoint = one ad visit. More checkpoints = more revenue but higher user drop-off. Recommended: **2-3 checkpoints** for a good balance.
+
+- **Session Time (1-24 minutes)**
+  How long a GetKey session stays alive. If a user doesn't complete all checkpoints within this window, their progress resets and they must start over. Set higher (10-15 min) if your users are slow, or lower (3-5 min) to prevent abuse.
+
+- **Bypass Delay (0-300 seconds)**
+  A mandatory wait time between completing each checkpoint. Set to 0 to disable. A small delay (15-30 seconds) helps prevent automated bypass tools from completing checkpoints instantly. The user sees a countdown timer. Too high a value frustrates real users.
+
+## Reset HWID Cooldown
+
+When a key is bound to an HWID, users can request an HWID reset (via the API or dashboard) to move their key to a different device. This setting controls how often that's allowed, preventing abuse like key sharing across multiple devices.
+
+- **Enable/Disable Toggle**
+  When **enabled**, a cooldown period is enforced between HWID resets. When **disabled**, users can reset their HWID as often as they want (not recommended).
+
+- **Cooldown Value + Unit (Free & Premium)**
+  There are **separate cooldown settings for Free users and Premium users**, allowing you to give premium key holders a shorter reset cooldown as a perk. Each has two fields:
+  - **Value** — A number (1-999)
+  - **Unit** — Seconds, Minutes, Hours, or Days
+
+  Example: Free users with Value = `24`, Unit = `hours` can reset once per day. Premium users with Value = `1`, Unit = `hours` can reset every hour. If they try sooner, they get an error with the remaining wait time.
+
+:::caution[Recommendation]
+Set a cooldown of at least 1 hour. Without a cooldown, users can share a single key across unlimited devices by rapidly resetting the HWID, which defeats the purpose of HWID binding.
+:::
+
+## Additional Features
+
+Extra options on the Checkpoint Settings tab for enhancing the GetKey experience.
+
+- **YouTube Tutorial**
+  A link to a video tutorial showing how to use your script. Displayed as a helpful link on the GetKey page. Not a challenge requirement — just a convenience link. Example: `https://youtube.com/watch?v=abc123`
+
+## Encrypt Checkpoint Page
+
+An anti-bypass honeypot system that adds invisible encrypted elements to your checkpoint pages. These elements are designed to trap and detect automated bypass tools.
+
+- **How It Works**
+  When enabled, the GetKey page includes hidden encrypted elements that look like real checkpoint data to bots. Real users never see or interact with these elements. If a bypass tool tries to interact with the honeypot, the attempt is flagged and the session is invalidated.
+
+- **Options**
+  - **None** — No encryption (default). Normal checkpoint page.
+  - **Advanced** — Enables the full honeypot encryption system with multiple trap layers.
+
+:::tip[Best used with]
+Enable Encrypt Checkpoint alongside **Deep-BYPASS Protection** (separate settings page) and **Bypass Delay** (Checkpoint Settings) for the most comprehensive anti-bypass setup. Each layer catches different types of bypass attempts.
+:::

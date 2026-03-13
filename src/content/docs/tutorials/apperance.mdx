@@ -1,0 +1,78 @@
+---
+title: Appearance
+description: Customize the look and feel of your GetKey page to match your script's branding.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Customize the look and feel of your GetKey page to match your script's branding. All changes are visible in the live preview at the top of the Appearance tab. Navigate to your service → `General Settings` → `Appearance` tab.
+
+## Live Preview
+
+At the top of the Appearance tab, you'll see a live preview card that shows exactly how your GetKey page navbar and button will look. As you change colors, logos, and settings below, the preview updates instantly. This lets you experiment with different looks without saving first.
+
+The preview shows your logo (or a placeholder), service name, and a sample “Get Key” button with your current gradient colors, all against your chosen navbar background color.
+
+## Service Logo
+
+Upload a custom logo that appears in the top-left corner of your GetKey page navbar, next to your service name.
+
+- **How to Upload**
+  Click the “Click to upload logo” area or drag and drop an image file. Supported formats: PNG, JPG, GIF, WebP. The image is uploaded to PandaAuth servers and served via CDN.
+
+- **How to Remove**
+  Hover over the logo preview thumbnail and click the trash icon that appears. This removes the logo and shows a blank placeholder.
+
+:::tip[Tip]
+Use a square image with a transparent background for the best results. Recommended size: 128x128 or 256x256 pixels. The logo is displayed at 32x32 pixels on the navbar, so keep it simple.
+:::
+
+## Button Gradient
+
+The “Get Key” button on the GetKey page uses a two-color gradient. You can customize both the start and end colors.
+
+- **Gradient Presets**
+  Click any of the 6 preset buttons to instantly apply a curated gradient:
+  - **Purple** (default) — `#6366f1` → `#8b5cf6`
+  - **Blue** — `#3b82f6` → `#06b6d4`
+  - **Green** — `#10b981` → `#22c55e`
+  - **Orange** — `#f97316` → `#eab308`
+  - **Pink** — `#ec4899` → `#f43f5e`
+  - **Red** — `#ef4444` → `#f97316`
+
+- **Custom Colors**
+  Use the two color pickers (start color on the left, end color on the right) to set any gradient you want. You can also type hex codes directly into the text inputs (e.g., `#ff6b00`).
+
+- **Reset**
+  Click the `Reset` button to restore the default purple gradient and navbar color.
+
+## Navbar Background
+
+Set the background color for the navigation bar at the top of your GetKey page. This is the area that contains your logo and service name. Choose from presets or set a custom hex color:
+
+- **Dark** — `#111111` (default, subtle dark)
+- **Darker** — `#0a0a0a` (near-black)
+- **Navy** — `#1e1b4b` (deep navy blue)
+- **Slate** — `#1e293b` (blue-gray)
+
+Click a preset button to apply it, or the color will be highlighted with a brand border when selected. You can also set any custom color via the button gradient color pickers.
+
+## Background
+
+Set a custom background for the entire GetKey page. Choose between a static image or a looping YouTube video.
+
+- **Image Background**
+  Click the `Image` tab, then click the upload area to select an image. The image covers the full page and scales to fit. Once uploaded, you'll see a preview thumbnail. Click the red trash icon to remove it. Supported formats: PNG, JPG, GIF, WebP.
+
+- **YouTube Video Background**
+  Click the `YouTube` tab and paste a YouTube video URL (e.g., `https://www.youtube.com/watch?v=dQw4w9WgXcQ`). The video plays in the background on a continuous loop, muted, with no controls visible. Great for aesthetic/ambient videos.
+
+- **Background Opacity (0-100%)**
+  Controls how visible the background is. Use the slider to adjust:
+  - **100%** — Fully visible background (may make text harder to read)
+  - **50-70%** — Good balance between visual appeal and readability
+  - **0%** — Background is completely transparent (invisible)
+
+:::tip[Tip]
+For the best readability, use a darker background image with 40-60% opacity. The GetKey page has a semi-transparent dark overlay, so lighter backgrounds may wash out the text.
+:::

@@ -1,0 +1,105 @@
+---
+title: Key Management
+description: The central hub for managing all authentication credentials for your service.
+---
+
+The Keys page is your central hub for managing all authentication credentials for your service. It has three tabs: `Active Keys` (HWID-bound keys in use), `Generated Keys` (pre-created keys waiting to be claimed), and `Whitelist` (keyless HWID entries).
+
+## Key Lifecycle
+
+Understanding how keys flow through the system helps you manage them effectively. A key goes through these stages:
+
+1. **Generated (Unbound)**
+   A key exists but has no HWID assigned. It sits in the `Generated Keys` tab, waiting to be distributed. You can create these manually from the dashboard or programmatically via the Dashboard API. Generated keys have a format like `PREFIX-XXXX-XXXX-XXXX` based on your Key Prefix and Key Format settings.
+
+2. **Activated (HWID Bound)**
+   When a user validates a generated key from their script for the first time, the key becomes "activated" — it moves from Generated Keys to Active Keys and is permanently bound to that user's HWID. From this point, only that device can use the key (if HWID Verification is enabled).
+
+3. **Active**
+   The key is in use and valid. Each time the user's script runs, it validates the key against PandaAuth's API. The key will remain active until it expires, is suspended, or is revoked.
+
+4. **Expired**
+   The key has passed its expiration date. Expired keys are automatically filtered out of the Active Keys list. The user will need to generate a new key through the GetKey flow (or receive a new generated key from you).
+
+5. **Suspended / Revoked**
+   Manually set by you. **Suspended** keys are temporarily disabled and can be reactivated later. **Revoked** keys are permanently disabled. Both will fail validation when the user's script checks them.
+
+:::note[GetKey-Generated Keys]
+Keys created through the GetKey flow (when users complete checkpoints) appear directly in the Active Keys tab — they skip the "Generated" stage because they're immediately bound to the user's HWID.
+:::
+
+## Active Keys Tab
+
+Displays all HWID-bound keys that are currently in use. This is where you'll spend most of your time managing keys.
+
+- **Search & Filter**
+  Use the search bar to find keys by key value, HWID, or note. Filter results by:
+  - **Status** — Active, Suspended, or Revoked
+  - **Key Type** — Normal or Premium
+  
+  The list auto-paginates and only shows non-expired keys by default.
+
+- **Key Statuses**
+  - **ACTIVE** (green) — Key is valid and will pass validation checks. This is the normal state.
+  - **SUSPENDED** (yellow) — Temporarily disabled. The user's script will fail validation, but you can reactivate the key later. Use this for temporary bans or investigations.
+  - **REVOKED** (red) — Permanently disabled. Cannot be reactivated. Use this for confirmed abusers or when you want to permanently remove access.
+
+- **Per-Key Actions**
+  Click the menu icon on any key row to access:
+  - **Edit** — Change the key's note, expiration date, status, or premium flag
+  - **Reset HWID** — Unbind the key from its current HWID so it can be activated on a different device
+  - **Copy Key** — Copy the full key value to your clipboard
+  - **Delete** — Permanently remove the key from the system
+
+- **Bulk Operations**
+  Select multiple keys using the checkboxes, then use the bulk action bar to delete all selected keys or change their status at once. Useful for cleaning up expired keys or mass-suspending a group.
+
+- **CSV Export**
+  Click the export button to download all active keys as a CSV file. The export includes key value, HWID, status, type (normal/premium), expiration date, creation date, and notes. Useful for backups, external analysis, or migration.
+
+## Generated Keys Tab
+
+Pre-created keys that haven't been activated yet. These are unbound — they have no HWID and are waiting to be distributed to users or claimed through the API.
+
+- **Creating Keys**
+  Click `Generate Keys` to open the generation dialog. You can also use the Dashboard API (`POST /api/v1/dev/services/:id/keys/generate`) for programmatic key creation. Up to 100 keys can be generated in a single batch.
+
+- **Expiration Options**
+  When generating keys, choose how long they should last:
+  - **By Days** — Key expires X days after it is *activated* (first use), not after creation. For example, a 30-day key generated today but activated next week will expire 30 days after next week.
+  - **By Date** — Key expires on a specific calendar date regardless of when it's activated. Good for time-limited promotions or event access.
+  - **Lifetime** — Key never expires. The user has permanent access as long as the key isn't revoked.
+
+- **Premium Keys**
+  Toggle the `Premium` checkbox when generating to create premium keys. Premium keys can have different multi-account limits (higher by default) and your script can check whether a key is premium to unlock additional features. Premium keys show a crown badge in the dashboard.
+
+- **Per-Key Overrides**
+  When generating keys, you can set custom limits that override the service-wide defaults for individual keys:
+  - **Max Devices Override** — Set a custom HWID/device limit for this specific key. Leave empty to use the service default from Multi-HWID settings. For example, a VIP key could allow 10 devices while your service default is 3.
+  - **Max Accounts Override** — Set a custom Roblox account limit for this key. Leave empty to use the service default from Multi-Account settings. Useful for giving specific users higher account limits.
+
+  Per-key overrides appear in the Generate Key modal when you toggle the `Custom Limits` option. They work for both free and premium keys and take priority over the service-wide defaults configured in Security → Authentication.
+
+- **Distribution**
+  After generating, you can copy individual keys or export the entire batch. Common distribution methods: paste in a Discord DM, use a sales bot, or share through your website.
+
+:::tip[Tip]
+Generated keys use the Key Prefix and Key Format configured in General Settings. Change these *before* generating keys if you want a specific format (e.g., `VIP-XXXX-XXXX-XXXX`).
+:::
+
+## Whitelist Tab (Keyless Entries)
+
+The third tab in Key Management. Used with `Keyless Mode` (Security → Authentication). When Keyless Mode is enabled, users don't need keys at all — access is controlled purely by HWID whitelist entries.
+
+- **Adding Entries**
+  Click `Add Entry` and provide:
+  - **HWID** — The user's Hardware ID (they can get this from the script output or you can find it in your logs)
+  - **Note** (optional) — A label to help you identify this user (e.g., their Discord username)
+  - **Expiration** (optional) — Set an expiration date, or leave blank for permanent access
+
+- **Managing Entries**
+  Search by HWID or note. Edit an entry to change the note or expiration. Delete entries to revoke access. Each row displays the HWID, note, creation date, and expiration date.
+
+:::caution[Important]
+The Whitelist tab only works when Keyless Mode is enabled in Security settings. If Keyless Mode is off, these entries have no effect — the system uses key-based validation instead.
+:::

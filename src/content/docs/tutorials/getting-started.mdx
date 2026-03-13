@@ -1,0 +1,139 @@
+---
+title: Getting Started
+description: A comprehensive guide to setting up and using the Panda Key System for your applications.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+A complete walkthrough to set up your first service, understand the dashboard, and start protecting your Roblox scripts with Panda Key System.
+
+:::note[What is Panda Key System?]
+Panda Key System is a key-based authentication platform for Roblox scripts. Script developers use it to monetize their scripts — users complete ad checkpoints (Linkvertise, LootLabs, etc.) to receive time-limited keys that grant access to your script. You earn revenue from the ads, and your script is protected from unauthorized use.
+:::
+
+## 1. Create an Account
+
+<Steps>
+
+1. **Visit the Registration Page**
+
+   Go to the Panda Key System website and click `Register`. You need to provide:
+   - **Email** — A valid email address for account recovery and notifications
+   - **Username** — 3-30 alphanumeric characters, this is your login identity
+   - **Password** — Minimum 8 characters, you'll need to confirm it
+
+2. **Log In**
+
+   After registering, you'll be automatically logged in and redirected to the dashboard. Your account starts on the **FREE** tier with access to core features.
+
+3. **Understand Your Tier**
+
+   Panda Key System has multiple tiers that unlock additional features:
+   - **FREE** — Basic key system with all core features
+   - **BASIC** — Custom service ads (1), contributors (2)
+   - **PREMIUM** — More ads (2), more contributors (6)
+   - **ENTERPRISE** — Maximum ads (3), contributors (10)
+
+   You can upgrade via redeem codes in Account Settings.
+
+</Steps>
+
+## 2. Create Your First Service
+
+A “service” represents one script or project. Each service has its own keys, settings, GetKey page, and API key. You can create multiple services for different scripts.
+
+<Steps>
+
+1. **Navigate to Services**
+
+   Click `Services` in the left sidebar, then click the `Create Service` button.
+
+2. **Fill in Service Details**
+
+   - **Service Name** — A display name visible on your GetKey page and dashboard (e.g., “My Script Hub”, “Premium ESP”). Can be changed anytime.
+   - **Identifier** — A globally unique alphanumeric slug used in your GetKey URL. This is like a username for your service — it must be unique across all of Panda Key System. Example: `myscripthub` creates the URL `/getkey/myscripthub`.
+
+3. **Click Create**
+
+   Your service is now live! You'll be taken to the service dashboard overview where you can see your API key and GetKey link.
+
+</Steps>
+
+## 3. Understanding the Dashboard Overview
+
+When you click into a service, the overview page is your command center. Here's what each section shows:
+
+- **Stats Cards (Top Row)**
+  Four cards showing real-time metrics:
+  - **Total Keys** — All keys ever created for this service
+  - **Active Keys** — Currently valid, non-expired keys
+  - **Validations Today** — How many times keys were validated in the last 24 hours
+  - **Unique Users** — Distinct HWIDs that have used your service
+
+- **API Key**
+  Your unique service API key used for external integrations (Discord bots, custom dashboards, etc.). Click the copy icon to copy it. Use the regenerate button if your key is compromised — this invalidates the old key immediately.
+
+- **GetKey Link**
+  The public URL your script's users will visit to obtain keys. Format: `/getkey/{identifier}`. Share this link or have your script open it automatically.
+
+- **Charts & Analytics**
+  Visual graphs showing validation trends over time, key generation history, and a geographic world map of where your users are located. Toggle between 7, 14, or 30-day views.
+
+## 4. How the GetKey Flow Works
+
+This is the core experience for your script's end users. Understanding this flow is essential:
+
+<Steps>
+
+1. **Your Script Sends the User to GetKey**
+
+   When a user runs your script without a valid key, your script opens a browser tab to the GetKey URL:
+   
+   ```text
+   /getkey/{your-identifier}?hwid={user-hwid}
+   ```
+   
+   The HWID (Hardware ID) is a unique identifier for the user's device. Your client library detects this automatically.
+
+2. **User Completes Checkpoints**
+
+   On the GetKey page, the user sees a “Get Key” button. Each click sends them to a monetization link (an ad, content locker, or URL shortener). After completing the ad, they return to the GetKey page and the checkpoint is marked complete. This repeats for each required checkpoint (configurable from 1-10).
+
+3. **Key is Generated and Displayed**
+
+   After completing all checkpoints, a key is automatically generated (e.g., `PANDA-A8F3-K9X2-M7B4`) and shown to the user. The key is bound to their HWID and has a time-based expiration (e.g., 24 hours).
+
+4. **User Enters Key in Script**
+
+   The user copies the key and pastes it when prompted by your script. Your script sends the key + HWID to the Panda validation API.
+
+5. **Validation Succeeds or Fails**
+
+   - **Valid** — The API confirms the key is valid and not expired. Your script runs normally.
+   - **Expired** — The key has passed its expiration time. The user must redo GetKey.
+   - **Invalid** — Wrong key or HWID mismatch. Access is denied.
+   - **Blacklisted** — The user's HWID has been blacklisted by you. Access is permanently denied.
+
+</Steps>
+
+:::tip[Quick Start Tip]
+Use the **PandaAuth** or **V3 Library** in your Lua script for automatic key validation, HWID detection, and error handling. Just copy the loader code from the Client Libraries section — it handles everything in a few lines. See the **Client Libraries** section in the sidebar.
+:::
+
+## 5. Next Steps
+
+Now that your service is created, here's what to configure:
+
+<Steps>
+
+1. **Set up Monetization** — Go to `Monetization` settings and connect a revenue provider (Linkvertise, LootLabs, etc.) so you earn money from checkpoints.
+
+2. **Configure Security** — Enable captchas, anti-bypass protections, and HWID verification to prevent abuse.
+
+3. **Customize Appearance** — Upload a logo, set brand colors, and add a background image to match your script's theme.
+
+4. **Add Your Script** — Integrate the PandaAuth client library into your Lua script. See the Client Libraries section for copy-paste code.
+
+5. **Set up Webhooks** — Connect a Discord webhook to get real-time notifications when keys are validated or generated.
+
+</Steps>

@@ -1,0 +1,58 @@
+---
+title: Webhooks & Analytics
+description: Connect PandaAuth to external services and view detailed statistics.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Webhooks allow PandaAuth to send automated real-time alerts to your Discord server or other external applications when specific events occur. Analytics provide deeper insights into your user base and service performance.
+
+## Managing Webhooks
+
+Webhooks are configured per-service in the `Webhooks` section.
+
+<Steps>
+
+1. **Add a Webhook URL**
+   Paste a valid Discord Webhook URL (or a compatible endpoint) into the Webhook URL field.
+
+2. **Select Events**
+   Check the boxes for the events you want to trigger this webhook:
+   - **Key Creations** — Triggers when a new key is generated (manually or via GetKey).
+   - **Key System Validations** — Triggers when a user successfully authenticates a key in your script.
+
+3. **Save Settings**
+   Click `Save Webhook`. You can add multiple webhooks for different event types.
+
+</Steps>
+
+:::tip[Discord Formatting]
+PandaAuth automatically formats the payload to display beautifully in Discord channels using embeds, showing the relevant information for each event type.
+:::
+
+## Viewing Analytics
+
+The `Analytics` section gives you a comprehensive view of your service's usage over time.
+
+### Available Metrics
+
+- **Key Validations**
+  Chart showing the number of successful key validations over time (daily/weekly/monthly). Useful for tracking active usage of your script.
+  
+- **New Keys Generated**
+  Chart tracking the number of new keys created via your GetKey link. Helpful for measuring user acquisition.
+  
+- **Ad Revenue Estimates**
+  If utilizing our monetization partners (Linkvertise, LootLabs), you can view estimated earnings directly within the PandaAuth dashboard.
+
+- **Geographic Data**
+  See where your users are located globally, helping you understand your audience demographics.
+
+:::note[Data Retention]
+Free tier users have access to 7 days of analytics history. Upgrading to Premium or higher extends data retention up to 90 days.
+:::
+
+### Filtering and Exporting
+
+- Change the date range using the date picker in the top right corner of the Analytics page.
+- Enterprise users can export analytics data to CSVformat for external processing.

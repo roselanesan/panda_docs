@@ -1,0 +1,59 @@
+---
+title: Contributors
+description: Invite team members to help manage your services.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Invite team members to help manage your services. Contributors receive granular permissions and can access specific parts of your service dashboard without having full ownership. Access from the sidebar → `Contributors` under your service settings.
+
+## Permission Types
+
+Four independent permissions can be assigned to each contributor. All permissions are per-service — a user can have different permissions on different services.
+
+- **Manage Keys**
+  Create, edit, and delete keys for the service. Includes generating keys, changing key status, resetting HWIDs, and bulk operations.
+
+- **Manage Settings**
+  Edit service configuration including general settings, security, monetization, and other service options.
+
+- **Manage VSS**
+  Access Virtual Script Storage for the service. Upload, edit, and manage scripts associated with the service. Subject to a separate VSS contributor limit based on your tier.
+
+- **View Statistics**
+  View service analytics and statistics. This is the default permission — enabled by default when inviting a contributor.
+
+## Inviting Contributors
+
+<Steps>
+
+1. **Open Contributors Page**
+   Navigate to your service → Settings → `Contributors`.
+
+2. **Add Contributor**
+   Click `Add Contributor`, enter the user's email address (they must already have a PandaAuth account), and select which permissions to grant.
+
+3. **Wait for Acceptance**
+   The invited user will see a pending invitation on their dashboard. They can accept or decline the invitation. Once accepted, they gain access to the service based on the assigned permissions.
+
+</Steps>
+
+:::note[Tier Limits]
+Free (1 contributor), Basic (2), Premium (6), Enterprise (10), Special (10). VSS contributors have separate limits: Free (1), Basic (2), Premium (4), Enterprise (10), Special (10).
+:::
+
+## Managing Contributors
+
+- **Edit Permissions**
+  Click `Edit` on any contributor to change their permissions. Changes take effect immediately.
+
+- **Remove Contributors**
+  Click the delete button to remove a contributor's access. They will lose all permissions for the service immediately.
+
+- **Contributor Status**
+  - **Pending** (yellow) — Invitation sent, waiting for the user to accept
+  - **Accepted** (green) — User accepted and has active access
+  - **Rejected** (gray) — User declined the invitation
+
+- **Leaving a Service**
+  Contributors can leave a service from their dashboard by clicking the leave button on the shared service card. This removes their access entirely.

@@ -1,0 +1,186 @@
+---
+title: Security
+description: Protect your service from bots, bypass tools, and abuse with captchas, traffic scanning, HWID verification, session limits, and more.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Protect your service from bots, bypass tools, and abuse with captchas, traffic scanning, HWID verification, session limits, and more. Security settings are split across two pages: the main `Security` page (5 tabs) and the standalone `Deep-BYPASS` page.
+
+## Protection
+
+The first tab in Security settings. Controls ad-block detection and captcha challenges on the GetKey page.
+
+- **Block AdBlock**
+  When enabled, users running ad-blocking extensions will be prevented from progressing through checkpoints. Since your revenue depends on users completing ads, keeping this on ensures ad impressions are actually counted. Users will see a message asking them to disable their ad blocker before they can continue.
+
+- **Captcha Type**
+  Adds a captcha challenge that users must solve before interacting with the GetKey page. This prevents automated bots from generating keys. Five options are available:
+  - **None** — No captcha (default). Best for low-risk services or when you want the simplest user experience.
+  - **Panda Captcha (Beta)** — Built-in captcha provided by PandaAuth. No external account needed — just toggle it on. Still in beta, so it may be less robust than third-party options.
+  - **Royal Guard (New)** — Custom captcha by B.Y.P.A.S.S. No external account needed — just select it and it works out of the box.
+  - **Cloudflare Turnstile** — Privacy-friendly, non-interactive captcha by Cloudflare. Users often don't even see a challenge. Requires a free Cloudflare account.
+  - **HCaptcha** — Image-based challenge captcha. Very effective against bots but requires users to solve visual puzzles. Requires a free hcaptcha.com account.
+
+:::note[Setting Up Turnstile or HCaptcha]
+1. Create a free account at **dash.cloudflare.com** (Turnstile) or **hcaptcha.com**
+2. Add your GetKey page domain as a site
+3. Copy the **Site Key** (public) and **Secret Key** (private)
+4. Paste both keys into the corresponding fields in the Protection tab
+5. Save changes — the captcha will immediately appear on your GetKey page
+:::
+
+## Vanguard (Advanced)
+
+The second tab in Security settings, marked with an “Advanced” badge. Vanguard is an intelligent traffic scanning layer that analyzes incoming requests for suspicious patterns and known bypass tool signatures. It operates passively in the background and doesn't affect normal users.
+
+- **Enable Vanguard**
+  Master toggle for the entire Vanguard protection system. When off, no traffic scanning occurs. When on, all incoming GetKey requests are analyzed.
+
+- **Protect Checkpoint Pages**
+  Extends Vanguard's scanning to the actual checkpoint pages (the ad/content locker pages), not just the initial GetKey page. Enable this for maximum coverage — it catches bypass attempts that happen mid-flow.
+
+- **Trust List**
+  A manual override list that lets you explicitly allow or deny specific HWIDs regardless of Vanguard's automated decisions:
+  - **Whitelist** — Trusted HWIDs that always pass Vanguard checks, even if they trigger a detection rule. Use this for your own devices, beta testers, or known-good users.
+  - **Blacklist** — Permanently blocked HWIDs that are always denied access, even if they wouldn't normally trigger a detection. Use this for confirmed abusers.
+  
+  You can search, filter (by whitelist/blacklist/all), and manage entries directly from the Trust List panel. Each entry stores the HWID, a note, and the date it was added.
+
+:::tip[Recommendation]
+Enable both Vanguard and Protect Checkpoint Pages for full coverage. Whitelist your own HWID so you can test your GetKey flow without being flagged.
+:::
+
+## Authentication
+
+The third tab in Security settings. Controls how keys are bound to users and how many devices/accounts can share a key.
+
+- **Authentication Type**
+  A dropdown in `General Settings → Checkpoint Settings` that determines how the system identifies users during the GetKey flow and key validation. Choose the strictness level that fits your use case:
+  - **IP Address** — Identifies users by IP only. Simplest but least secure — users behind the same NAT/VPN share an identity.
+  - **HWID Only** — Identifies by Hardware ID, a unique device fingerprint. **Recommended for most Roblox scripts.**
+  - **HWID + IP** — Both HWID and IP must match. Most strict — prevents sharing keys across networks.
+  - **Fingerprint** — Uses browser fingerprinting. Works without a script-provided HWID but is less reliable.
+  
+  This setting directly affects session tracking, key binding, and the behavior of HWID Verification, Multi-Account, and Multi-HWID features below.
+
+- **HWID Verification**
+  When enabled (default: on), each key is permanently bound to the Hardware ID of the device that first validates it. Subsequent validation attempts from a different HWID will be rejected. This is the primary anti-sharing mechanism — it prevents users from distributing keys to others.
+
+  :::caution[Important]
+  Disabling HWID verification means any device can use any key. Only disable this if you intentionally want shareable keys (e.g., group/team keys).
+  :::
+
+- **Keyless Mode**
+  Activates a pure HWID-based whitelist system with no keys involved at all. Instead of generating and distributing keys, you manually add allowed HWIDs to the Whitelist (Key Management → Whitelist tab). When a user's script validates, it checks if their HWID is on the whitelist rather than checking a key.
+  
+  Best for: Private scripts, invite-only access, small user bases, or paid scripts where you manually control who has access.
+
+- **Multi-Account per Key**
+  By default, one key = one Roblox account. Enabling this allows a single key to be validated from multiple Roblox accounts (but still the same HWID if HWID Verification is on). You set separate limits for free and premium keys:
+  - **Max Free** — How many Roblox accounts can use a single free key (default: 1, range: 1-100)
+  - **Max Premium** — How many accounts per premium key (default: 6, range: 1-100)
+  
+  This is useful when users have alt accounts. Increasing the premium limit gives premium key holders an extra perk.
+
+- **Multi-HWID per Key (Multi-Device)**
+  By default, one key = one device (HWID). Enabling Multi-HWID allows a single key to be validated from multiple devices. You set separate limits for free and premium keys:
+  - **Free Users Device Limit** — How many devices can use a single free key (default: 1, range: 1-100)
+  - **Premium Users Device Limit** — How many devices per premium key (default: 3, range: 1-100)
+  
+  Multi-HWID is **independent** of Multi-Account — they stack. For example, 3 devices × 5 accounts = up to 15 total sessions per key.
+  
+  When Multi-HWID is enabled, the Active Keys table shows a “Devices” column where you can view and remove individual devices from each key. Resetting HWID clears all linked devices.
+  
+  **Per-Key Device Override:** Premium keys can have a custom device limit set during generation. When creating a premium key, set the “Max Devices (HWID Limit)” field to override the service-wide limit for that specific key. Leave empty to use the service default. Free keys always use the service default limit.
+  
+  Keys with `noHwidValidation` bypass device limits entirely, regardless of this setting.
+  
+  **Accounts & Devices Page:** A dedicated dashboard page under Key Management lets you view all registered accounts and devices across all keys, search by Account ID or HWID, and remove individual entries.
+
+- **Session Limit**
+  Enforces that only one active execution session can exist per key at any time. This prevents key sharing in real-time — if User A is running the script with Key X, and User B tries to run with the same key, User A's session is automatically terminated.
+  
+  How it works: Your script sends periodic “heartbeat” pings to confirm it's still running. If no heartbeat is received within the timeout window, the session is considered inactive and the key becomes available again.
+  - **Heartbeat Timeout** — Seconds of silence before a session expires (range: 10–600, default: 60). Lower values detect disconnects faster but may cause false positives on laggy connections. A value of 60 seconds works well for most scripts.
+
+## Checkpoint Mode
+
+The fourth tab in Security settings. Determines how checkpoint counts and key durations are calculated.
+
+- **Standard Mode (Default)**
+  All users complete the same fixed number of checkpoints (set in General Settings → Checkpoint Count) and receive a key with the same expiration time (set in General Settings → Expiration Time). This is the simplest setup and works for most services.
+  
+  Example: 3 checkpoints → 24-hour key for everyone.
+
+- **Variable Mode**
+  Gives users a choice of key durations on the GetKey page. Longer keys require more checkpoints, which means more ad revenue for you while giving users flexibility. Each tier can be independently enabled/disabled and has its own checkpoint count:
+
+  | Duration | Default Checkpoints | Customizable |
+  | --- | --- | --- |
+  | 6 Hours | 1 checkpoint | 1–10 |
+  | 12 Hours | 2 checkpoints | 1–10 |
+  | 24 Hours | 3 checkpoints | 1–10 |
+  | 48 Hours | 4 checkpoints | 1–10 |
+  
+  Disable individual tiers you don't want to offer. For example, you could disable 6h and 48h to only offer 12h and 24h options.
+
+:::tip[Tip]
+Variable mode typically generates more revenue because users who want longer keys will complete more checkpoints. It also improves user satisfaction since casual users can choose fewer checkpoints for a shorter key.
+:::
+
+## Challenges
+
+The fifth tab in Security settings. Optional social tasks that users must complete as part of the GetKey flow. These help grow your YouTube channel and Discord community. You must enable the master `Challenges Enabled` toggle before any individual challenges will work.
+
+- **Subscribe Challenge**
+  Requires users to subscribe to a YouTube channel before proceeding. When enabled, a YouTube Channel URL field appears directly in the Challenges tab where you enter your channel link (e.g., `https://youtube.com/@yourchannel`). Users will see a “Subscribe” button on the GetKey page and the system verifies completion before allowing them to continue.
+
+- **Like & Comment Challenge**
+  Requires users to like and comment on a specific YouTube video. When enabled, a YouTube Video URL field appears directly in the Challenges tab where you enter the video link. Great for promoting tutorials or update videos and boosting engagement.
+
+- **Discord Challenge**
+  Requires users to join your Discord server. When enabled, a Discord Server ID field appears directly in the Challenges tab. Enter just the server ID (a numeric string), not the full invite URL.
+
+:::caution[Note]
+All challenge URLs and IDs are configured directly inside the `Security → Challenges` tab. When you enable a challenge, the corresponding URL/ID field appears inline. Don't enable challenges without filling in the required field — users will see a broken challenge with no link.
+:::
+
+## Deep-BYPASS Protection
+
+A separate settings page (not a tab in Security) accessible from the sidebar under your service. Deep-BYPASS is an advanced anti-bypass layer that specifically targets automated tools and services that try to skip your monetization checkpoints without actually completing the ads.
+
+- **Master Toggle**
+  Enable or disable the entire Deep-BYPASS system. When disabled, all detection methods and presets are inactive. All settings below require this to be enabled.
+
+- **Minimum Time**
+  The minimum number of seconds a user must spend on a checkpoint before it can be marked complete. Completions faster than this are flagged as automated bypasses. Adjustable from 1 to 70 seconds. Default: 20 seconds.
+  
+  Lower values (5–10s) are lenient, allowing fast completions. Higher values (30–60s) are strict and ensure users actually interact with the ad content. A sweet spot of 15–25 seconds works well for most providers.
+
+- **Security Detections**
+  Five individual detection methods you can toggle on or off independently:
+  - **Referer Check** — Verifies that the request returning from the ad came from a legitimate source. Catches simple redirect-based bypasses.
+  - **Userscript Detection** — Detects browser extensions or Tampermonkey/Greasemonkey userscripts that try to automate the GetKey flow.
+  - **AdBlock Detection** — Blocks users who have ad blockers interfering with checkpoint completion (works alongside the Protection tab's Block AdBlock but at a deeper level).
+  - **Unicode Detection** — Catches bypass attempts that use Unicode character manipulation to trick the validation logic.
+  - **Spoof Completion** — Detects fake or forged checkpoint completion signals that weren't generated by a real ad interaction.
+
+- **Bypass Service Presets**
+  Pre-built detection profiles for well-known bypass services. Each preset is a toggle that, when enabled, activates detection rules targeting a specific bypass provider. Keep all presets enabled unless you have a specific reason to disable one (e.g., false positives from a specific service).
+
+- **Fallback**
+  Controls what happens when a bypass is detected. When enabled, instead of a hard block (which reveals that detection occurred), the user is given a fallback action — typically redirected to complete the checkpoint again. This is stealthier and prevents bypass tools from adapting to your detection.
+
+- **Revenue Booster**
+  A set of additional toggles within Deep-BYPASS that maximize your ad revenue by ensuring users fully engage with monetization content. Six settings are available:
+  - **Block VPNs** — Blocks VPN and proxy connections for better CPM rates and cleaner traffic. Enabled by default.
+  - **Block Incognito** — Blocks private/incognito browsing for better-targeted ads and higher revenue. Enabled by default.
+  - **Block Ad-Blockers** — Ensures ads are displayed and revenue is protected. Works at the Deep-BYPASS level alongside the Protection tab's Block AdBlock. Enabled by default.
+  - **Extra Wall** — Adds an additional ad layer after completion that also blocks automated browsers. Enabled by default.
+  - **Captcha Required** — Requires a captcha to block 100% of automated and bot completions. Enabled by default.
+  - **Revenue Forcer** — Disables the “Skip Ads” option on Linkvertise, forcing users to watch the full ad. Boosts CPM by approximately +30%. Disabled by default (opt-in). *Linkvertise only.*
+
+:::tip[Maximum Protection Setup]
+Enable Deep-BYPASS with all 5 detections on + all bypass service presets enabled + Fallback on + all Revenue Booster toggles on + Encrypt Checkpoint (from General Settings) set to Advanced. This combination provides the strongest anti-bypass and revenue configuration available.
+:::

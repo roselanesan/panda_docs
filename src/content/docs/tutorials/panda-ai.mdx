@@ -1,0 +1,60 @@
+---
+title: Panda AI
+description: Configure and utilize PandaAuth's AI chat assistant for your scripts.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Panda AI is an artificial intelligence assistant integrated into the PandaAuth platform. It can be configured to help your users with script usage, troubleshooting, and general inquiries directly from your GetKey page or custom portal.
+
+## Setting Up Panda AI
+
+To enable and configure Panda AI for your service:
+
+<Steps>
+
+1. **Navigate to AI Settings**
+   Go to your Service → Settings → `Panda AI`.
+
+2. **Enable AI Assistant**
+   Toggle the `Enable Panda AI` switch to turn the assistant on for your service.
+
+3. **Configure System Prompt**
+   The system prompt defines how the AI behaves. You can customize the prompt to give the AI specific knowledge about your script.
+   
+   *Example: "You are a helpful assistant for the 'NinjaScript' tool. NinjaScript is a Roblox script that helps users farm items. If they ask about execution errors, tell them to check their executor version."*
+
+4. **Set Up Knowledge Base (Optional)**
+   You can provide specific FAQ entries or text documents to expand the AI's knowledge beyond the basic prompt.
+
+</Steps>
+
+:::tip[AI Credits]
+Panda AI usage consumes AI Credits. Each plan comes with a monthly allocation of AI Credits. If you run out, the AI assistant will be temporarily disabled until the next billing cycle.
+:::
+
+## AI Assistant Placements
+
+Once enabled, Panda AI can appear in multiple locations:
+
+- **GetKey Page Widget**
+  A chat bubble appears on your GetKey page, allowing users to ask questions while they complete the authentication process.
+  
+- **VSS Integration**
+  If utilizing Virtual Script Storage, the AI can assist users with issues related to specific scripts they are attempting to load.
+
+## Customizing AI Appearance
+
+You can customize how the AI assistant looks to match your service branding:
+
+- **Assistant Name** — Change the display name from "Panda AI" to your script's support name (e.g., "NinjaSupport Bot").
+- **Welcome Message** — The first message the AI sends when a user opens the chat. (Default: "Hello! How can I help you today?")
+- **Theme Colors** — Match the chat widget bubbles to your primary service colors (available on Premium+ tiers).
+
+## Monitoring Conversations
+
+Enterprise and Special tier users have access to the AI Chat Logs:
+
+- Review transcripts of conversations between the AI and your users.
+- Identify common questions or pain points your users are facing.
+- Use these insights to improve your system prompt or update your actual script documentation.

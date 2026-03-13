@@ -1,0 +1,70 @@
+---
+title: Account Settings
+description: Manage your PandaAuth account profile, security, and billing.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Your personal account settings handle your profile, general security preferences, billing information, and access tokens. Access these settings by clicking your avatar in the top right and selecting `Settings`.
+
+## Profile & Appearance
+
+- **Avatar and Display Name**
+  Update your profile picture and the name displayed to your contributors and users on shared pages.
+- **Theme**
+  Switch the dashboard interface between Light, Dark, and System default themes.
+- **Email Preferences**
+  Opt in or out of marketing emails, newsletters, and non-critical product updates.
+
+## Account Security
+
+Protect your account from unauthorized access.
+
+<Steps>
+
+1. **Change Password**
+   Update your account password regularly.
+
+2. **Two-Factor Authentication (2FA)**
+   Enable 2FA via an authenticator app (like Authy or Google Authenticator) for an essential extra layer of security. We highly recommend enabling this for all developers.
+
+3. **Active Sessions**
+   View all currently logged-in devices. Click `Revoke` to forcefully log out any unrecognized or old sessions.
+
+</Steps>
+
+:::caution[Recovery Codes]
+When enabling 2FA, be sure to save your backup recovery codes in a secure location. If you lose access to your authenticator app and don't have recovery codes, you may lose access to your account permanently.
+:::
+
+## API Keys
+
+API keys (Personal Access Tokens) are required to interact with the PandaAuth Web API. 
+
+- **Creating an API Key**
+  Click `Generate New Key`, give it a recognizable name (e.g., "Main Bot Script"), and define its expiration.
+- **Permissions**
+  Currently, API keys have full access to your account. Treat them like passwords.
+- **Revoking**
+  If an API key is compromised or no longer needed, click `Revoke` to invalidate it immediately.
+
+## Billing & Subscription
+
+Manage your PandaAuth plan and payment methods.
+
+- **Current Plan**
+  View your active platform tier, renewal date, and resource limits.
+- **Upgrade/Downgrade**
+  Change your subscription tier. Changes are prorated automatically.
+- **Payment Methods**
+  Add, remove, or update credit cards used for your subscription.
+- **Invoices**
+  Download previous billing statements and receipts.
+
+## Account Deletion
+
+If you wish to leave the platform, you can permanently delete your account.
+
+:::caution[Permanent Action]
+Deleting your account is irreversible. All your services, keys, scripts, and data will be permanently destroyed. Active subscriptions will end immediately without refund.
+:::

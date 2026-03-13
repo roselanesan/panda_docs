@@ -1,0 +1,77 @@
+---
+title: Discord Integration
+description: Connect Discord to PandaAuth via OAuth, guild binding, and manual verification.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+PandaAuth integrates with Discord in three ways: account linking via OAuth, guild binding for bot-based script distribution, and manual verification for users who need alternative authentication.
+
+## Discord Account Linking
+
+Link your personal Discord account to your PandaAuth account via OAuth. This enables Discord-based features and verification.
+
+<Steps>
+
+1. **Navigate to Settings**
+   Go to your account settings or profile page in the PandaAuth dashboard.
+
+2. **Connect Discord**
+   Click the Discord link/connect button. You'll be redirected to Discord's authorization page.
+
+3. **Authorize Access**
+   Approve the OAuth request on Discord. Your Discord username, avatar, and ID will be linked to your PandaAuth account. The connection status appears on your profile.
+
+</Steps>
+
+:::note[Note]
+Each Discord account can only be linked to one PandaAuth account. If you need to unlink, contact an administrator.
+:::
+
+## Discord Guild Binding
+
+Bind your Discord server (guild) to your PandaAuth account to enable bot-based script distribution. Guild binding allows the PandaAuth Discord bot to serve VSS scripts directly to your server members.
+
+<Steps>
+
+1. **Initiate Binding**
+   Use the PandaAuth Discord bot command in your server to initiate a binding session. The bot generates a temporary confirmation token.
+
+2. **Confirm on Dashboard**
+   Open the confirmation link provided by the bot. You'll see the guild name, icon, and member count. Click `Confirm Binding` to link the guild to your account.
+
+3. **Select Active Service**
+   After binding, select which of your services the guild should be associated with. This determines which scripts the bot can distribute.
+
+</Steps>
+
+:::caution[Member Requirement]
+Guilds with 1,300 or more members can access VSS scripts via Discord bot commands. This requirement helps prevent abuse and ensures scripts are distributed to established communities.
+:::
+
+## Discord Challenge
+
+The Discord Challenge is configured in `Security → Challenges`. When enabled, users must join your Discord server before they can proceed through the GetKey flow.
+
+- **Setup**
+  Enable the Discord Challenge toggle in Security → Challenges, then enter your Discord Server ID (numeric string). Users will see a “Join Discord” button on the GetKey page.
+
+- **How It Works**
+  The system verifies that the user has joined the specified Discord server before allowing them to continue. This helps grow your Discord community and provides an additional layer of engagement.
+
+## Manual Verification
+
+An alternative verification pathway for users who cannot use Discord OAuth. Users generate a temporary verification token that a moderator can review.
+
+- **Process**
+  1. User generates a verification token (valid for 3 days)
+  2. Moderator creates a private Discord channel for the user
+  3. User provides their Discord invitation link for verification
+  4. Moderator reviews and approves/rejects the request
+
+- **Verification Statuses**
+  - **Pending Request** — Token generated, waiting for moderator
+  - **Pending Review** — Channel created, under review
+  - **Approved** — Verification successful
+  - **Rejected** — Verification denied (with reason)
+  - **Expired** — Token expired after 3 days

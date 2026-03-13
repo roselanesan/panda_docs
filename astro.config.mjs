@@ -6,7 +6,7 @@ import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
-    site: 'https://roselanesan.github.io',
+    site: 'https://docs.pandadevelopment.net',
     base: '/panda_docs',
     integrations: [starlight({
         title: 'Panda Key System',
@@ -33,6 +33,25 @@ export default defineConfig({
                     { label: 'Dashboard API', slug: 'web-api/dashboard-api' },
                 ],
             },
+            {
+                label: 'Tutorials',
+                items: [
+                    { label: 'Getting Started', slug: 'tutorials/getting-started' },
+                    { label: 'General Settings', slug: 'tutorials/general-settings' },
+                    { label: 'Apperance', slug: 'tutorials/apperance' },
+                    { label: 'Security', slug: 'tutorials/security' },
+                    { label: 'Monetization', slug: 'tutorials/monetization' },
+                    { label: 'Key Management', slug: 'tutorials/key-management' },
+                    { label: 'Virtual Storage', slug: 'tutorials/virtual-storage' },
+                    { label: 'Service Ads', slug: 'tutorials/service-ads' },
+                    { label: 'Contributors', slug: 'tutorials/contributors' },
+                    { label: 'Discord Integration', slug: 'tutorials/discord-integration' },
+                    { label: 'Referral Program', slug: 'tutorials/referral-program' },
+                    { label: 'Panda AI', slug: 'tutorials/panda-ai' },
+                    { label: 'Webhook & Analytics', slug: 'tutorials/webhook-analytics' },
+                    { label: 'Account Settings', slug: 'tutorials/account-settings' }, 
+                ],
+            }
         ],
 		}), react()],
 });

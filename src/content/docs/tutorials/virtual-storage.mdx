@@ -1,0 +1,126 @@
+---
+title: Virtual Script Storage
+description: Upload, manage, obfuscate, and distribute Lua scripts without exposing your source code.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Virtual Script Storage (VSS) is PandaAuth's cloud script hosting platform. It lets you upload, manage, obfuscate, and distribute Lua scripts without exposing your source code. Access VSS from the sidebar → `Virtual Storage`.
+
+## What is Virtual Script Storage?
+
+Instead of sharing raw `.lua` files that anyone can read and steal, VSS lets you upload your script to the cloud and share a loadstring URL. When a user executes the loadstring in their Roblox executor, it fetches the latest version of your script from PandaAuth's servers in real-time.
+
+- **Key Benefits**
+  - **Instant Updates** — Upload a new version and every user gets it immediately. No need to redistribute files or update Discord messages.
+  - **Code Protection** — Apply IB1 or Luraph obfuscation to make your code unreadable and prevent reverse engineering.
+  - **Version Control** — Full version history for every script. Roll back to any previous version with one click if an update breaks something.
+  - **Execution Statistics** — Track how many times your scripts are being executed.
+  - **Single URL** — One loadstring URL that always points to the latest version. No need to update URLs when pushing new versions.
+
+## Virtual Storage Page Overview
+
+At the top of the page, you'll see your account information:
+
+- **Tier Badge**
+  Shows your current tier (FREE, BASIC, PREMIUM, ENTERPRISE, SPECIAL). Your tier determines script limits and feature access.
+
+- **Token Balance**
+  Displays your current VSS token count (the coin icon with a number). Tokens are consumed when you obfuscate scripts.
+
+- **Script Count**
+  Shows how many scripts you've uploaded. Most tiers have unlimited scripts.
+
+Below the stats, each script is displayed as a card showing its name, associated service, obfuscation type, file size, creation date, and last modified date.
+
+## Uploading a Script
+
+<Steps>
+
+1. **Click Upload Script**
+   Click the `Upload Script` button (the + icon) at the top of the Virtual Storage page.
+
+2. **Fill in the Upload Form**
+   - **Script Name** — A descriptive name to identify the script in your dashboard (e.g., “Main Script”, “Auto Farm Hub”)
+   - **Service** — Select which service this script belongs to from the dropdown. The script will be associated with that service for organization purposes.
+   - **Lua File** — Click or drag-and-drop to upload your `.lua` file. Only `.lua` files are accepted.
+   - **Obfuscation** — Choose `None`, `IB1`, or `Luraph` (see Obfuscation Options below)
+
+3. **Upload and Process**
+   Click `Upload`. If obfuscation is selected, the script will be sent to the obfuscation engine for processing (this may take a few seconds for Luraph). One VSS token is consumed per obfuscated upload. A success notification confirms the upload.
+
+</Steps>
+
+## Advanced Script Options
+
+When uploading or editing a script, four additional toggles are available for fine-tuning script behavior and security. These are all optional and disabled by default.
+
+- **Reinforced Loader**
+  When enabled, a special “Reinforced URL” is generated alongside the standard loadstring URL. The reinforced loader adds a security layer that uses Roblox-only functions (such as `game`, `readfile`) to verify the execution environment. This ensures the script can only be loaded inside an actual Roblox executor, blocking browser-based or external bypass tools from fetching and running your code.
+
+- **Disable Panda Macro**
+  Skips the automatic macro expansion for `PANDA_AUTHENTICATE`, `PANDA_AUTHENTICATE_PREMIUM`, and `PANDA_GETKEY`. Normally, VSS detects these strings in your code and replaces them with the PandaAuth library calls during processing. Enable this toggle if your script contains these exact strings for a different purpose (e.g., in comments, display text, or a custom implementation) and you don't want them replaced.
+
+- **Remove All Print Functions**
+  Automatically strips all `print()` calls from the script before obfuscation. This runs after library injection and macro expansion, so it catches prints from both your code and injected library code. Useful for cleaning up terminal output in production builds while keeping debug prints in your source file.
+
+- **Whitelist Only**
+  Restricts script execution to specific Roblox players. When enabled, the script will verify the user's Player ID before executing — only players whose IDs are on the whitelist can run it. Use the `Manage Whitelist` button on the script card to add or remove allowed Roblox Player IDs. This is ideal for private scripts, paid access, or beta testing with a controlled group of users.
+
+## Obfuscation Options
+
+Obfuscation transforms your readable Lua code into an unreadable format while keeping it fully functional. This prevents others from copying, reverse-engineering, or modifying your script.
+
+- **None**
+  No obfuscation applied. The script is hosted exactly as you uploaded it. Anyone with the loadstring URL could theoretically read your source code. Does **not** consume a VSS token. Best for open-source scripts or testing.
+
+- **IB1**
+  A fast, lightweight obfuscation engine. Processes scripts quickly (usually under 2 seconds) and produces code that runs with minimal performance overhead. Good balance between protection and speed. Consumes **1 VSS token** per obfuscation.
+
+- **Luraph**
+  An advanced, industry-grade obfuscation engine. Takes longer to process (5–30 seconds depending on script size) but produces significantly harder-to-reverse output with multiple protection layers. Best for high-value scripts you want maximum protection for. Consumes **1 VSS token** per obfuscation.
+
+:::note[Note]
+Obfuscation is applied each time you upload or update a script. Re-uploading a new version with obfuscation consumes another token. Uploading without obfuscation (None) never costs tokens.
+:::
+
+## VSS Tokens
+
+VSS tokens are the currency for obfuscation. Each obfuscation operation (uploading or updating a script with IB1 or Luraph) consumes exactly 1 token. Uploading without obfuscation is free.
+
+- **Purchasing Tokens**
+  Click `Buy Tokens` on the Virtual Storage page to open the purchase dialog:
+  - **Price:** $0.50 per token
+  - **Minimum purchase:** 2 tokens ($1.00)
+  - **Maximum purchase:** 100 tokens ($50.00)
+  - **Payment methods:** PayPal or credit/debit card
+  
+  Use the + and − buttons to adjust the quantity, then select your payment method and complete the checkout.
+
+- **Free Tokens**
+  You may receive free VSS tokens through redeem codes (Account Settings → Redeem Code), promotions, or as part of a tier upgrade.
+
+## Managing Scripts
+
+Each script card has a three-dot menu (…) that provides these actions:
+
+- **Get Loadstring**
+  Opens a dialog showing the loadstring URL and a ready-to-use Lua code snippet. Copy the loadstring and share it with your users. The URL always serves the latest version of the script, so users never need to update their loadstring.
+
+- **Edit Script**
+  Update the script name, upload a new `.lua` file (creating a new version), or change the obfuscation method. If you change to or keep an obfuscation method (IB1/Luraph), another token will be consumed for the re-obfuscation.
+
+- **Version History**
+  View every version of the script in chronological order. Each version shows its timestamp, file size, and obfuscation type. You can **restore** any previous version with one click — making it the new active version served by the loadstring URL.
+
+- **View Code**
+  Preview the current script source code in a syntax-highlighted viewer directly in the browser. Only shows the original (non-obfuscated) code for your reference.
+
+- **Stats**
+  View execution statistics for the script, including total executions and recent activity.
+
+- **Download**
+  Download the script `.lua` file to your local machine.
+
+- **Delete**
+  Permanently remove the script and all its versions. This cannot be undone — the loadstring URL will stop working and users will get an error. You'll be asked to confirm before deletion.

@@ -1,0 +1,151 @@
+---
+title: Monetization
+description: Configure the revenue providers that power your GetKey flow.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Configure the revenue providers that power your GetKey flow. At each checkpoint, users interact with an ad, content locker, or link shortener — this is how you earn money from your key system. The Monetization page has three tabs: `Revenue Settings`, `Custom Revenue`, and `PayPal Settings`.
+
+## How Monetization Works
+
+When a user arrives at your GetKey page, they need to complete one or more checkpoints (configured in General Settings). At each checkpoint, the system redirects the user to your chosen monetization provider — the user sees an ad, completes a task, or unlocks content. When they return to the GetKey page, the checkpoint is marked complete and they progress to the next one.
+
+Providers come in two flavors:
+
+- **Normal Providers**
+  Checkpoint completion is validated on the frontend. The user is redirected to the provider, completes the action, and returns with a completion token that the frontend accepts. Simple to set up, but easier for bypass tools to fake the completion signal.
+
+- **Secured Providers**
+  Checkpoint completion is validated on the backend. Instead of the user bringing back a token, the provider itself calls back to PandaAuth's servers to confirm the user actually completed the action. Much harder to bypass because the completion signal never passes through the user's browser.
+
+:::tip[Recommendation]
+Use Secured providers whenever possible. If your provider offers both normal and secured modes (e.g., Linkvertise vs. Secured Linkvertise), always choose the secured variant for better bypass protection.
+:::
+
+## Revenue Settings (Setup)
+
+The first tab in Monetization. This is where you select your primary provider and enter your API credentials.
+
+<Steps>
+
+1. **Choose a Provider**
+   Select your preferred provider from the dropdown. The form will update dynamically to show the correct input fields for that provider (e.g., “Publisher ID” for Linkvertise, “API Token” for LootLabs).
+
+2. **Enter Your Credentials**
+   Paste the required credentials from your provider's dashboard. Each field includes a helper text description explaining where to find the value. For providers that need a link URL (like LootLabs), you'll see an additional field.
+
+3. **Save Changes**
+   Click `Save Changes`. Your GetKey page will immediately start routing users to the new provider. Test it by visiting your GetKey link to confirm everything works.
+
+</Steps>
+
+:::caution[Important]
+Setting the provider to `None (No Monetization)` will generate keys without any ad checkpoints — users get keys instantly. This is useful for testing but means no revenue.
+:::
+
+## All Supported Providers
+
+PandaAuth supports 15 monetization providers. Here is each one with what credentials it requires:
+
+- **Linkvertise**
+  The most popular provider for key systems. Requires your `Publisher ID` (a numeric ID found in your Linkvertise dashboard, e.g., `23330`). Users are redirected to a Linkvertise page where they complete a task to unlock the link.
+
+- **Secured Linkvertise**
+  Backend-verified version. Requires your `Linkvertise Link URL` (the full URL of your Linkvertise link) and your `Anti-Bypass Token` (found in Linkvertise Publisher Dashboard → Settings → Anti-Bypass). Completions are verified server-side via hash validation, making bypasses significantly harder.
+
+- **LootLabs**
+  Content locker platform. Requires your `API Token` (from lootlabs.gg dashboard) and `LootLabs Link URL` (your content locker link).
+
+- **Secured LootLabs**
+  Backend-verified LootLabs. Requires your `LootLabs API Token` (from Profile → API Key) and `LootLabs Base Link`. Callbacks are encrypted automatically via the LootLabs API — no manual callback URL setup needed.
+
+- **Work.ink**
+  Monetization platform with content locking. Requires your `X-Api-Key` from dashboard.work.ink.
+
+- **Fly.inc / Rinku.pro**
+  Link shortener with ads. Requires your `API Key` from your Rinku.pro dashboard.
+
+- **Ad-Maven / Ad-Maven Secure**
+  **Ad-Maven:** Content locker, requires `API Token`. **Ad-Maven Secure:** Backend-verified version, requires a `64-character hex API Token` (from Publisher Dashboard → Settings → API) and a `Redirect Link URL`. Callbacks are encrypted via AdMaven's URL Encryptor API.
+
+- **Other Providers**
+  Also supported with their respective API keys: `Lockr.so` (Bearer Token), `Short-Jambo` (API Key), `Cuty.io` (API Token), `Shrinkearn` (API Key), `ShrtFly` (API Key), and `Boostelar` (Campaign URL, not API key).
+
+- **Universal Link (Any Shortener)**
+  Works with *any* URL shortener (adf.ly, bit.ly, or your own). No API key needed. You shorten the system's encrypted callback URL using your shortener, and when users complete the shortened link and are redirected back, the checkpoint increments automatically. This is a secured provider (backend callback) but with zero validation — any shortener that redirects to the callback URL will work. Requires per-checkpoint setup (like Secured Linkvertise): each checkpoint gets its own shortened URL.
+
+## Custom Revenue Per Checkpoint
+
+Found under the `Custom Revenue` tab. By default, every checkpoint uses the same provider. Custom Revenue lets you assign a different provider to each checkpoint position, each with its own separate credentials.
+
+- **How to Set Up**
+  Enable Custom Revenue, then for each checkpoint number (1, 2, 3...) select a provider from the dropdown and fill in its credentials. Each checkpoint operates independently.
+
+- **Example Configuration**
+  If you have 3 checkpoints, you could set:
+  - Checkpoint 1: LootLabs (content locker)
+  - Checkpoint 2: Secured Linkvertise (link monetization)
+  - Checkpoint 3: Work.ink (content locker)
+
+- **Why Use Multiple Providers?**
+  - Diversifies your revenue across platforms
+  - If one provider goes down, other checkpoints still work
+  - Different providers pay more in different regions
+  - Mix secured and normal providers for balance of security and compatibility
+
+## Multi-Revenue Mode
+
+Found under the `Revenue Settings` tab. Multi-Revenue lets you configure up to three different providers simultaneously: **Primary**, **Secondary**, and **Tertiary**. On the GetKey page, users can choose which provider they want to use for their checkpoints.
+
+- **How It Works**
+  Each revenue slot (Primary, Secondary, Tertiary) operates independently with its own provider selection and credentials. When a user visits the GetKey page, they see all enabled providers as options and can pick the one they prefer. This increases completion rates since users may prefer one provider over another.
+
+- **Setting Up Multiple Providers**
+  1. Configure your **Primary** provider as usual in Revenue Settings
+  2. Expand the **Secondary Revenue** section and select a different provider
+  3. Optionally expand the **Tertiary Revenue** section for a third option
+  4. Each slot has its own provider dropdown, API credentials, and secured checkpoint configuration
+
+- **Example Setup**
+  - **Primary:** Secured Linkvertise (highest CPM)
+  - **Secondary:** LootLabs (content locker alternative)
+  - **Tertiary:** Universal Link (works with any shortener)
+
+- **Why Use Multi-Revenue?**
+  - Users in different regions may earn more from different providers
+  - If one provider goes down, users can switch to another
+  - Giving users a choice increases overall completion rates
+  - Mix of providers diversifies your revenue stream
+
+:::tip[Tip]
+Multi-Revenue works alongside Custom Revenue Per Checkpoint. If Custom Revenue is enabled, it takes precedence over the multi-revenue slot selection for individual checkpoints.
+:::
+
+## Setting Up Secured Providers
+
+Secured providers (Secured Linkvertise, Secured LootLabs, Ad-Maven Secure, Universal Link) have a different setup flow because they require per-checkpoint configuration with encrypted callback URLs.
+
+<Steps>
+
+1. **Select a Secured Provider**
+   Choose `Secured Linkvertise`, `Secured LootLabs`, `Ad-Maven Secure`, or `Universal Link` from the provider dropdown.
+
+2. **Configure Each Checkpoint**
+   Once selected, a card appears for each checkpoint showing:
+   - **Encrypted Callback URL** — A unique URL you need to copy and paste into your provider's dashboard as the callback/webhook URL. For Secured LootLabs, this is handled automatically.
+   - **Link URL / Credentials** — Your provider link and any required tokens
+   - **Status Indicator** — Green “Configured” badge when set up, amber “Required” when incomplete
+
+3. **Save Each Checkpoint**
+   Click `Save` on each checkpoint card individually. All checkpoint cards must show “Configured” for the secured provider to work properly.
+
+</Steps>
+
+:::note[Provider-Specific Notes]
+**Secured LootLabs** doesn't require manually copying callback URLs — the system encrypts callbacks automatically via the LootLabs API. **Universal Link** works with any URL shortener: you copy the encrypted callback URL, shorten it with your preferred service (adf.ly, bit.ly, etc.), and paste the shortened URL back. No API key or token is needed.
+:::
+
+## PayPal Settings
+
+The third tab in Monetization. Configure your PayPal account to receive payments for premium keys and other paid features. Enter your PayPal email or Client ID to enable payment processing.

@@ -1,0 +1,78 @@
+---
+title: Service Ads
+description: Display custom advertisements on your GetKey page to earn additional revenue.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Display custom advertisements on your GetKey page to earn additional revenue. Service Ads let you inject banners, popups, and custom scripts alongside your monetization checkpoints. Access from the sidebar → `Ads` under your service.
+
+## Ad Types
+
+Three ad types are available for service owners. Each type has different placement and behavior options.
+
+- **Banner**
+  Static HTML banners displayed at a fixed position on the GetKey page. Choose from three positions:
+  - **Top** — Banner appears at the top of the page
+  - **Bottom** — Banner appears at the bottom of the page
+  - **Sidebar** — Banner appears in the sidebar area
+
+- **Popup**
+  Modal popups that appear based on configurable triggers. Best for attention-grabbing promotions or additional ad impressions. Supports frequency control so users aren't overwhelmed.
+
+- **Script**
+  Inject custom HTML or JavaScript directly into the GetKey page. Use this for third-party ad network scripts, tracking pixels, or custom widget code.
+
+## Popup Triggers & Frequency
+
+Popup ads support multiple trigger types and frequency controls to balance visibility with user experience.
+
+- **Trigger Types**
+  - **Load** — Shows immediately when the page loads
+  - **Delay** — Shows after a specified number of seconds (configurable via Popup Delay field)
+  - **Scroll** — Shows when the user scrolls to 50% of the page
+  - **Exit** — Shows on exit intent (when the user moves their cursor toward closing the tab)
+
+- **Frequency Options**
+  - **Always** — Show every time the trigger fires
+  - **Session** — Show once per browser session
+  - **Once** — Show once ever (tracked client-side)
+
+- **Timing Controls**
+  - **Cooldown** — Seconds before the ad can show again to the same user (0 = no cooldown)
+  - **Stagger Delay** — Delay between multiple popups/scripts in seconds (default: 0.5s). Prevents all ads from firing simultaneously.
+
+## Targeting & Priority
+
+Control which devices and checkpoints see your ads.
+
+- **Device Targeting**
+  - **All** — Show on all devices
+  - **Desktop** — Show only on desktop browsers
+  - **Mobile** — Show only on mobile devices
+
+- **Checkpoint Targeting**
+  - **All** — Show on every checkpoint
+  - **Specific** — Choose which checkpoint numbers see the ad (e.g., only checkpoint 1 and 3)
+
+- **Priority**
+  Higher priority ads are displayed first within their category. If you have multiple banners for the same position, the higher-priority one takes precedence.
+
+## Creating & Managing Ads
+
+<Steps>
+
+1. **Create an Ad**
+   Click `Create Ad` and select the ad type (Banner, Popup, or Script). Fill in the name, HTML content, and configure targeting options.
+
+2. **Configure Settings**
+   Set the device targeting, checkpoint targeting, priority, and type-specific options (position for banners, trigger/frequency for popups).
+
+3. **Activate**
+   New ads are active by default. Use the toggle to enable/disable individual ads without deleting them. Disabled ads won't appear on the GetKey page.
+
+</Steps>
+
+:::note[Tier Limits]
+The number of ads you can create depends on your tier: Free (0), Basic (1), Premium (2), Special (2), Enterprise (3). Upgrade your tier to create more ads.
+:::
